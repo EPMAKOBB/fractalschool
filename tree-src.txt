@@ -1,0 +1,64 @@
+Microsoft Windows [Version 10.0.19045.5854]
+(c) Корпорация Майкрософт (Microsoft Corporation). Все права защищены.
+
+D:\fractalschool\src>tree /f
+Структура папок тома Новый том
+Серийный номер тома: BA11-E3B0
+D:.
+├───app
+│   │   favicon.ico
+│   │   globals.css
+│   │   layout.tsx
+│   │   page.tsx
+│   │
+│   ├───about
+│   │       page.tsx
+│   │
+│   ├───api
+│   │   ├───attempts
+│   │   │       route.ts
+│   │   │
+│   │   └───generate
+│   │           route.ts
+│   │
+│   ├───auth
+│   │   └───callback
+│   │           page.tsx
+│   │
+│   ├───components
+│   │       AuthNav.tsx
+│   │
+│   ├───contacts
+│   │       page.tsx
+│   │
+│   ├───dashboard
+│   │       page.tsx
+│   │
+│   ├───ege-inf
+│   │       page.tsx
+│   │
+│   ├───ege-math
+│   │       page.tsx
+│   │
+│   ├───ege-phys
+│   │       page.tsx
+│   │
+│   ├───login
+│   │       page.tsx
+│   │
+│   ├───oge-inf
+│   │       page.tsx
+│   │
+│   ├───oge-math
+│   │       page.tsx
+│   │
+│   ├───oge-phys
+│   │       page.tsx
+│   │
+│   └───tasks_meta
+│       └───[templateId]
+│               page.tsx
+│
+└───lib
+        supabase.ts
+
