@@ -4,8 +4,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-import Link from "next/link";
-import { AuthNav } from "./components/AuthNav"; // <-- добавили импорт
+import Header from "./components/Header"; // Импортируем отдельный компонент
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,15 +31,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-900 text-white`}
       >
-        {/* Шапка с навигацией */}
-        <header className="flex justify-between items-center p-4 border-b border-gray-700">
-          <h1 className="text-xl font-bold">
-            <Link href="/">[Ф]рактал - подготовка к ЕГЭ и ОГЭ</Link>
-          </h1>
-          <nav className="space-x-4">
-            <AuthNav /> {/* вот тут теперь динамика */}
-          </nav>
-        </header>
+        {/* Глобальный заголовок вынесен в Header */}
+        <Header />
 
         {/* Основной контент */}
         <main className="p-6">{children}</main>
