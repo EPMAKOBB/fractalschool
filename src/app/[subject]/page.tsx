@@ -5,12 +5,12 @@ import { supabase } from "../../lib/supabase";
 import Link from "next/link";
 import { Suspense } from "react";
 
-type Props = {
-  params: { subject: string };
-};
+ type Props = {
+   params: Promise<{ subject: string }>
+ }
 
-export default async function SubjectPage({ params }: Props) {
-  const { subject } =  params;
+ export default async function SubjectPage(props: Props) {
+   const { subject } = await props.params 
 
   // Находим meta по красивому URL (например, inf-ege)
   const meta = tablesMeta.find(t => t.name === subject);
