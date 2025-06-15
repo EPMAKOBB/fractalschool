@@ -5,10 +5,11 @@ import { tablesMeta } from "../../../config/tablesMeta";
 import TaskCard from "../../../components/TaskCard";
 
 type Props = {
-  params: { subject: string; type: string };
+  params: Promise<{ subject: string; type: string }>;
 };
 
-export default async function TypeTasksPage({ params }: Props) {
+export default async function TypeTasksPage(props: Props) {
+  const params = await props.params;
   const { subject, type } = params;
 
   // Находим метаданные предмета по "name"

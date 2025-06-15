@@ -6,10 +6,11 @@ import { Suspense } from "react";
 import VariantRunner from "../../../components/VariantRunner";
 
 type Props = {
-  params: { subject: string; variant: string };
+  params: Promise<{ subject: string; variant: string }>;
 };
 
-export default async function VariantPage({ params }: Props) {
+export default async function VariantPage(props: Props) {
+  const params = await props.params;
   const { subject, variant } = params;
 
   // 1. Найти метаданные предмета
