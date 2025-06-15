@@ -10,7 +10,7 @@ type Props = {
 };
 
 export default async function SubjectPage({ params }: Props) {
-  const { subject } = await params;
+  const { subject } =  params;
 
   // Находим meta по красивому URL (например, inf-ege)
   const meta = tablesMeta.find(t => t.name === subject);
