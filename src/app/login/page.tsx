@@ -7,6 +7,18 @@ export default function LoginPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const signInWithGoogle = async () => {
+    await supabase.auth.signInWithOAuth({ provider: "google" });
+  };
+
+  const signInWithVk = async () => {
+    await supabase.auth.signInWithOAuth({ provider: "vk" });
+  };
+
+  const signInWithGithub = async () => {
+    await supabase.auth.signInWithOAuth({ provider: "github" });
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -52,6 +64,26 @@ export default function LoginPage() {
           {loading ? "Отправка..." : "Получить ссылку для входа"}
         </button>
       </form>
+      <div className="mt-6 space-y-2">
+        <button
+          onClick={signInWithGoogle}
+          className="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700 transition"
+        >
+          Войти через Google
+        </button>
+        <button
+          onClick={signInWithVk}
+          className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 transition"
+        >
+          Войти через VK
+        </button>
+        <button
+          onClick={signInWithGithub}
+          className="w-full bg-gray-800 text-white p-2 rounded hover:bg-gray-900 transition"
+        >
+          Войти через GitHub
+        </button>
+      </div>
       {message && <p className="mt-4 text-center">{message}</p>}
     </main>
   );
