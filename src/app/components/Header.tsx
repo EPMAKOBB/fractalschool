@@ -1,6 +1,6 @@
 // src/app/components/Header.tsx
 
-"use client"; // 👈 Должно быть первой строкой!
+"use client";
 
 import Link from "next/link";
 import { AuthNav } from "./AuthNav";
@@ -10,13 +10,16 @@ export default function Header() {
   const subjects = tablesMeta.filter(t => t.category === "tasks");
 
   return (
-    <header className="flex justify-between items-center p-4 border-b border-gray-700">
-      <h1 className="text-xl font-bold">
-        <Link href="/">[Ф]рактал - подготовка к ЕГЭ и ОГЭ</Link>
-      </h1>
-      <div className="flex-1 flex justify-center">
+    <header className="border-b border-gray-700 p-3 sm:p-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        {/* Логотип и заголовок */}
+        <h1 className="text-lg sm:text-xl font-bold whitespace-pre-line">
+          <Link href="/">[Ф]рактал - подготовка{'\n'}к ЕГЭ и ОГЭ</Link>
+        </h1>
+        
+        {/* Селектор предметов */}
         <select
-          className="px-3 py-1 rounded bg-gray-800 text-white border border-gray-600"
+          className="w-full sm:w-auto px-3 py-1 rounded bg-gray-800 text-white border border-gray-600"
           defaultValue=""
           onChange={e => {
             if (e.target.value) window.location.href = `/${e.target.value}`;
@@ -29,10 +32,12 @@ export default function Header() {
             </option>
           ))}
         </select>
+
+        {/* Навигация (Личный кабинет/Вход) */}
+        <nav className="flex justify-end w-full sm:w-auto">
+          <AuthNav />
+        </nav>
       </div>
-      <nav className="space-x-4">
-        <AuthNav />
-      </nav>
     </header>
   );
 }

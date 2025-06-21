@@ -1,10 +1,9 @@
 // src/app/layout.tsx
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-import Header from "./components/Header"; // Импортируем отдельный компонент
+import Header from "./components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,21 +20,19 @@ export const metadata: Metadata = {
   description: "Подготовка к ОГЭ и ЕГЭ по информатике, математике, физике",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
+import ClientHeader from "./components/ClientHeader";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-900 text-white`}
-      >
-        {/* Глобальный заголовок вынесен в Header */}
-        <Header />
-
-        {/* Основной контент */}
-        <main className="p-6">{children}</main>
+      <body className="...">
+        <ClientHeader />
+        <main className="p-3 sm:p-6">{children}</main>
       </body>
     </html>
   );
