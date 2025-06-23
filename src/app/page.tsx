@@ -13,6 +13,9 @@ export default function Home() {
 
   return (
     <main className="flex flex-col items-center mt-4 text-white bg-gray-900 min-h-screen">
+      
+
+
       {/* ——— Блок приветствия и миссии проекта ——— */}
       <section className="w-full max-w-2xl flex flex-col items-center text-center px-4 py-6 mb-6">
         <h2 className="text-3xl font-bold mb-4 text-blue-300">
@@ -36,6 +39,7 @@ export default function Home() {
       </section>
 
       {/* ——— Остальной функционал страницы ——— */}
+      
       <div className="mb-2">вы можете задать вопрос нейросети:</div>
       <input
         type="text"

@@ -9,6 +9,7 @@ import TaskResultView from "./TaskResultView";
 type Task = {
   id: number | string;
   task_id: string | number;
+  task_type?: string | number; // важно для TaskCard заголовка!
   answer_type?: string;
   answer: any;
   maxScore?: number;
@@ -18,6 +19,7 @@ type Task = {
 
 type Props = {
   tasks: Task[];
+  subject: string; // <--- теперь обязателен!
 };
 
 // инициализируем «пустой» ответ под нужный тип
@@ -38,7 +40,7 @@ function getBlankAnswer(answerType?: string) {
   }
 }
 
-export default function VariantRunner({ tasks }: Props) {
+export default function VariantRunner({ tasks, subject }: Props) {
   /** все ответы пользователя */
   const [answers, setAnswers] = useState<any[]>(
     tasks.map(t => getBlankAnswer(t.answer_type))
@@ -54,26 +56,27 @@ export default function VariantRunner({ tasks }: Props) {
   function onChangeAnswer(idx: number, value: any) {
     setAnswers(prev => {
       const next = [...prev];
-      next[idx] = value;          // всегда сохраняем *полный* объект ответа
+      next[idx] = value; // всегда сохраняем *полный* объект ответа
       return next;
     });
   }
 
   /** проверяем весь вариант */
-function handleCheckVariant() {
-  const preparedTasks = tasks.map((task, idx) => ({
-    id: task.id,
-    answerType: task.answer_type || "single",
-    correctAnswer: task.answer,
-    userAnswer: answers[idx],
-    maxScore: task.maxScore,
-  }));
+  function handleCheckVariant() {
+    const preparedTasks = tasks.map((task, idx) => ({
+      id: task.id,
+      answerType: task.answer_type || "single",
+      correctAnswer: task.answer,
+      userAnswer: answers[idx],
+      maxScore: task.maxScore,
+    }));
 
-  //  ⬇️ второй аргумент – массив введённых ответов
-  const res = checkVariant(preparedTasks, answers);
-  setResults(res);
-  setChecked(true);
-}
+    //  ⬇️ второй аргумент – массив введённых ответов
+    const res = checkVariant(preparedTasks, answers);
+    setResults(res);
+    setChecked(true);
+  }
+
   /* ---------- Этап ввода ответов ---------- */
   if (!checked) {
     return (
@@ -91,6 +94,7 @@ function handleCheckVariant() {
             mode="variant"
             value={answers[idx]}
             onChange={val => onChangeAnswer(idx, val)}
+            subject={subject}
           />
         ))}
 

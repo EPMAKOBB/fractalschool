@@ -60,7 +60,7 @@ export default async function VariantPage(props: Props) {
         {meta.label}: вариант {variantData.title || variantData.id}
       </h1>
       <Suspense fallback={<div>Загрузка задач...</div>}>
-        <VariantRunner tasks={orderedTasks} />
+        <VariantRunner tasks={orderedTasks} subject={subject} />
       </Suspense>
     </main>
   );

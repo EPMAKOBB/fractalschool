@@ -31,7 +31,7 @@ export default async function TaskPage(props: Props) {
       <h1 className="text-2xl font-bold mb-6">
         {meta.label}: задача №{data.task_id}
       </h1>
-      <TaskCard task={data} mode="single" />
+      <TaskCard task={data} subject={subject} mode="single" />
     </main>
   );
 }

@@ -32,7 +32,7 @@ export default async function TypeTasksPage(props: Props) {
       </h1>
       <div className="flex flex-col gap-6">
         {tasks.map((task: any) => (
-          <TaskCard key={task.id} task={task} mode="single" />
+          <TaskCard key={task.id} subject={subject} task={task} mode="single" />
         ))}
       </div>
     </main>

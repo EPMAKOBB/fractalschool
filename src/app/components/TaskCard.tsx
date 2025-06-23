@@ -2,8 +2,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { checkAnswer, CheckResult } from "@/utils/checkAnswer";
 import clsx from "clsx";
+import ClientTaskStatement from "./ClientTaskStatement";
 
 /* ---------- Типы ---------- */
 type UserAnswer = string | string[] | string[][];
@@ -11,6 +13,7 @@ type UserAnswer = string | string[] | string[][];
 type Task = {
   id: number | string;
   task_id: string | number;
+  task_type?: string | number;
   statement: string;
   answer: any;
   solution: string;
@@ -21,6 +24,7 @@ type Task = {
 type SingleModeProps = {
   task: Task;
   mode: "single";
+  subject: string;
 };
 
 type VariantModeProps = {
@@ -29,6 +33,7 @@ type VariantModeProps = {
   value: UserAnswer;
   onChange: (answer: UserAnswer) => void;
   disabled?: boolean;
+  subject: string;
 };
 
 type TaskCardProps = SingleModeProps | VariantModeProps;
@@ -77,7 +82,7 @@ function formatAnswer(answer: any) {
 
 /* ---------- Компонент ---------- */
 export default function TaskCard(props: TaskCardProps) {
-  const { task } = props;
+  const { task, subject } = props;
   const answerType = task.answer_type || "single";
 
   /* ===== SINGLE MODE STATE ===== */
@@ -97,9 +102,9 @@ export default function TaskCard(props: TaskCardProps) {
       case "single":
         return (
           <input
-            className="border rounded px-2 py-1 text-black"
+            className="border rounded px-2 py-1 w-full"
             value={answer as string}
-            onChange={e => onChange(e.target.value)}
+            onChange={(e) => onChange(e.target.value)}
             placeholder="Ваш ответ"
             disabled={disabled}
           />
@@ -109,12 +114,12 @@ export default function TaskCard(props: TaskCardProps) {
       case "pair_partial":
         return (
           <div className="flex gap-2">
-            {[0, 1].map(idx => (
+            {[0, 1].map((idx) => (
               <input
                 key={idx}
-                className="border rounded px-2 py-1 text-black"
+                className="border rounded px-2 py-1"
                 value={(answer as string[])[idx]}
-                onChange={e => onChange(e.target.value, idx)}
+                onChange={(e) => onChange(e.target.value, idx)}
                 placeholder={`Ответ ${idx + 1}`}
                 disabled={disabled}
               />
@@ -138,9 +143,9 @@ export default function TaskCard(props: TaskCardProps) {
                   {Array.from({ length: cols }).map((__, col) => (
                     <td key={col} className="p-1">
                       <input
-                        className="border rounded px-2 py-1 w-16 text-black"
+                        className="border rounded px-2 py-1 w-16"
                         value={(answer as string[][])[row][col]}
-                        onChange={e => onChange(e.target.value, row, col)}
+                        onChange={(e) => onChange(e.target.value, row, col)}
                         placeholder={`[${row + 1},${col + 1}]`}
                         disabled={disabled}
                       />
@@ -156,9 +161,9 @@ export default function TaskCard(props: TaskCardProps) {
       default:
         return (
           <input
-            className="border rounded px-2 py-1 text-black"
+            className="border rounded px-2 py-1 w-full"
             value={answer as string}
-            onChange={e => onChange(e.target.value)}
+            onChange={(e) => onChange(e.target.value)}
             placeholder="Ваш ответ"
             disabled={disabled}
           />
@@ -168,7 +173,7 @@ export default function TaskCard(props: TaskCardProps) {
 
   /* ===== SINGLE MODE HANDLERS ===== */
   function onChangeAnswerSingle(val: string, row?: number, col?: number) {
-    setUserAnswer(prev => {
+    setUserAnswer((prev) => {
       let next: UserAnswer = prev;
 
       if (answerType === "single") {
@@ -179,7 +184,7 @@ export default function TaskCard(props: TaskCardProps) {
         next = arr;
       } else if (answerType === "table_2x2" || answerType === "table_10x2") {
         const arr = Array.isArray(prev)
-          ? (prev as string[][]).map(r => [...r])
+          ? (prev as string[][]).map((r) => [...r])
           : (getInitialAnswer(answerType) as string[][]);
         arr[row!][col!] = val;
         next = arr;
@@ -187,7 +192,7 @@ export default function TaskCard(props: TaskCardProps) {
 
       return next;
     });
-    setResult(null); // сбрасываем старый результат
+    setResult(null);
   }
 
   function handleCheckSingle() {
@@ -199,6 +204,28 @@ export default function TaskCard(props: TaskCardProps) {
     setResult(checkRes);
   }
 
+  /* ---------- Заголовок ---------- */
+  function renderHeader() {
+    return (
+      <div className="mb-2 font-semibold flex items-center gap-2 flex-wrap">
+        <span>Задача №</span>
+        <Link
+          href={`/${subject}/task/${task.task_id}`}
+          className="text-blue-400 underline hover:text-blue-600"
+        >
+          {task.task_id}
+        </Link>
+        <span>,</span>
+        <Link
+          href={`/${subject}/type/${task.task_type ?? ""}`}
+          className="text-blue-400 underline hover:text-blue-600"
+        >
+          тип {task.task_type}
+        </Link>
+      </div>
+    );
+  }
+
   /* ------------------------------------------------------------------ */
   /* ---------------------------- RENDER ------------------------------- */
   /* ------------------------------------------------------------------ */
@@ -207,11 +234,10 @@ export default function TaskCard(props: TaskCardProps) {
   if (props.mode === "single") {
     return (
       <div className="border rounded-lg bg-gray-800 p-4 mb-4">
-        <div className="mb-2 font-semibold">
-          <span className="text-blue-400">№ {task.task_id}</span>
-        </div>
+        {renderHeader()}
 
-        <div className="mb-4 whitespace-pre-line">{task.statement}</div>
+        {/* Условие задачи */}
+        <ClientTaskStatement html={task.statement} />
 
         {/* Ввод и кнопка проверки */}
         <div className="flex flex-col gap-2 mb-2">
@@ -248,7 +274,7 @@ export default function TaskCard(props: TaskCardProps) {
         {/* Решение / ответ */}
         <button
           className="text-blue-400 underline text-sm"
-          onClick={() => setShowSolution(s => !s)}
+          onClick={() => setShowSolution((s) => !s)}
         >
           {showSolution ? "Скрыть решение и ответ" : "Показать решение и ответ"}
         </button>
@@ -272,7 +298,6 @@ export default function TaskCard(props: TaskCardProps) {
   if (props.mode === "variant") {
     const { value, onChange, disabled } = props;
 
-    /** собираем *полный* объект ответа и отдаём родителю */
     function onChangeAnswerVariant(val: string, row?: number, col?: number) {
       let next: UserAnswer;
 
@@ -284,7 +309,7 @@ export default function TaskCard(props: TaskCardProps) {
         next = arr;
       } else if (answerType === "table_2x2" || answerType === "table_10x2") {
         const arr = Array.isArray(value)
-          ? (value as string[][]).map(r => [...r])
+          ? (value as string[][]).map((r) => [...r])
           : (getInitialAnswer(answerType) as string[][]);
         arr[row!][col!] = val;
         next = arr;
@@ -292,7 +317,7 @@ export default function TaskCard(props: TaskCardProps) {
         next = val;
       }
 
-      onChange(next); // ↑ отдаем полностью
+      onChange(next);
     }
 
     return (
@@ -302,16 +327,11 @@ export default function TaskCard(props: TaskCardProps) {
           disabled && "opacity-60 pointer-events-none"
         )}
       >
-        <div className="mb-2 font-semibold">
-          <span className="text-blue-400">№ {task.task_id}</span>
-        </div>
-
-        <div className="mb-4 whitespace-pre-line">{task.statement}</div>
-
+        {renderHeader()}
+        <ClientTaskStatement html={task.statement} />
         <div className="flex flex-col gap-2 mb-2">
           {renderInput(value, onChangeAnswerVariant, disabled)}
         </div>
-        {/* В режиме варианта — без проверки и решения */}
       </div>
     );
   }
