@@ -1,14 +1,13 @@
 // src/app/[subject]/page.tsx
 
-import { tablesMeta } from "../config/tablesMeta";
+import { subjectsMeta } from "../config/subjectsMeta";
 import { supabase } from "../../lib/supabase";
 import Link from "next/link";
-import { Suspense } from "react";
 
 /**
  * Динамическая страница предмета `/[subject]`
- * Показывает доступные варианты и список типов задач.
- * Next.js 15: `params` приходит как Promise, поэтому **нужно await**.
+ * – показывает доступные варианты и список типов задач,
+ *   беря данные из единых таблиц `subjects`, `variants`, `tasks_static`.
  */
 
 type Props = {
@@ -16,12 +15,17 @@ type Props = {
 };
 
 export default async function SubjectPage(props: Props) {
-  /* ---------- Распаковываем параметры ---------- */
+  /* ---------- slug из маршрута ---------- */
   const { subject } = await props.params;
 
-  /* ---------- Метаданные предмета ---------- */
-  const meta = tablesMeta.find(t => t.name === subject);
-  if (!meta) {
+  /* ---------- предмет из БД ---------- */
+  const { data: subjRow, error: subjErr } = await supabase
+    .from("subjects")
+    .select("*")
+    .eq("slug", subject)
+    .single();
+
+  if (subjErr || !subjRow) {
     return (
       <main className="p-8 text-red-400">
         Неизвестный предмет: {subject}
@@ -29,63 +33,73 @@ export default async function SubjectPage(props: Props) {
     );
   }
 
-  /* ---------- Список доступных вариантов ---------- */
-  const variantTable = tablesMeta.find(
-    t => t.category === "variants" && t.sourceForVariants === subject,
-  );
+  /* ---------- UI-метаданные (иконка/цвет/порядок) ---------- */
+  const uiMeta = subjectsMeta.find(s => s.slug === subject);
 
-  let variants: any[] = [];
-  if (variantTable) {
-    const { data, error } = await supabase.from(variantTable.dbName).select("*");
-    if (!error && data) variants = data;
-  }
+  /* ---------- Варианты ---------- */
+const { data: rawVariants, error: varErr } = await supabase
+  .from("variants")
+  .select("id,title,slug")
+  .eq("subject_id", subjRow.id)
+  .order("year", { ascending: false });
 
-  /* ---------- Кол‑во типов задач ---------- */
-  const taskTypesCount = meta.taskTypesCount ?? 0;
+if (varErr) console.error(varErr);
 
-  /* ------------------------------------------------------------------ */
-  /* ------------------------------ UI --------------------------------- */
-  /* ------------------------------------------------------------------ */
+const variants = rawVariants ?? []; 
+
+  /* ---------- Список уникальных типов задач ---------- */
+ const { data: typesRaw, error: typesErr } = await supabase
+  .from("tasks_static")
+  .select("type_num")
+  .eq("subject_id", subjRow.id);
+
+if (typesErr) console.error(typesErr);
+
+const typeNums = Array.from(
+  new Set((typesRaw ?? []).map(t => t.type_num).filter(Boolean)),
+).sort((a, b) => a! - b!);// 1, 2, 3 …
+
+  /* ---------- Рендер ---------- */
   return (
     <main className="max-w-3xl mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">{meta.label}</h1>
+      <h1 className="text-3xl font-bold mb-6">
+        {uiMeta?.label ?? subjRow.title}
+      </h1>
 
-      {/* Варианты */}
+      {/* Варианты экзамена */}
       <section className="mb-8">
         <h2 className="mb-2 font-semibold">Варианты</h2>
         {variants.length === 0 ? (
           <div className="text-gray-400">Нет доступных вариантов</div>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {variants
-              .filter(v => v.slug)
-              .map((variant, idx) => (
-                <Link
-                  key={variant.id}
-                  href={`/${subject}/variant/${variant.slug}`}
-                  className="px-3 py-1 border rounded bg-gray-800 hover:bg-gray-700"
-                >
-                  {variant.title || `Вариант ${idx + 1}`}
-                </Link>
-              ))}
+            {variants.map((v, i) => (
+              <Link
+                key={v.id}
+                href={`/${subject}/variant/${v.slug}`}
+                className="px-3 py-1 border rounded bg-gray-800 hover:bg-gray-700"
+              >
+                {v.title || `Вариант ${i + 1}`}
+              </Link>
+            ))}
           </div>
         )}
       </section>
 
-      {/* Типы задач */}
+      {/* Типы заданий */}
       <section>
         <h2 className="mb-2 font-semibold">Задания по типам</h2>
-        {taskTypesCount === 0 ? (
+        {typeNums.length === 0 ? (
           <div className="text-gray-400">Типы заданий отсутствуют</div>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {Array.from({ length: taskTypesCount }, (_, i) => (
+            {typeNums.map(n => (
               <Link
-                key={i}
-                href={`/${subject}/type/${i + 1}`}
+                key={n}
+                href={`/${subject}/type/${n}`}
                 className="px-3 py-1 border rounded bg-gray-800 hover:bg-gray-700"
               >
-                Тип {i + 1}
+                Тип {n}
               </Link>
             ))}
           </div>
