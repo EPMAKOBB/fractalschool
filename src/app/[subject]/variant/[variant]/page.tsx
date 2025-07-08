@@ -3,7 +3,7 @@
 import { supabase } from "../../../../lib/supabase";
 import { subjectsMeta } from "../../../config/subjectsMeta";
 import { Suspense } from "react";
-import VariantRunner from "../../../components/VariantRunner";
+
 
 type Props = {
   params: Promise<{ subject: string; variant: string }>;
@@ -91,7 +91,7 @@ export default async function VariantPage(props: Props) {
       </h1>
 
       <Suspense fallback={<div>Загрузка задач…</div>}>
-        <VariantRunner tasks={orderedTasks} subject={subject} />
+
       </Suspense>
     </main>
   );
