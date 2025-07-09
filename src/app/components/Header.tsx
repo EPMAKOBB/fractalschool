@@ -3,19 +3,36 @@
 
 import Link from "next/link";
 import { AuthNav } from "./AuthNav";
-import { subjectsMeta } from "../config/subjectsMeta";
+// import { subjectsMeta } from "../config/subjectsMeta"; // Removed static import
+import type { SubjectMeta } from "@/lib/dbSubjects"; // Import the type
+import { useEffect, useState } from "react";
+import { useParams, usePathname } from "next/navigation";
+
+
+interface HeaderProps {
+  subjects: SubjectMeta[]; // Accept subjects as a prop
+}
 
 /**
  * Шапка сайта.
- * Показывает селектор предметов на основе `subjectsMeta`
- * (чисто UI-метаданные: slug, label, icon, порядок).
+ * Показывает селектор предметов на основе данных из БД.
  */
+export default function Header({ subjects: initialSubjects }: HeaderProps) {
+  const [subjects, setSubjects] = useState<SubjectMeta[]>(initialSubjects);
+  const params = useParams();
+  const pathname = usePathname();
 
-export default function Header() {
-  /* сортируем, если задано поле order */
-  const subjects = [...subjectsMeta].sort(
-    (a, b) => (a.order ?? 99) - (b.order ?? 99),
-  );
+  // Determine the current subject slug from URL params or pathname
+  const currentSubjectSlug = params?.subject
+    ? String(params.subject)
+    : pathname?.split('/')[1] || "";
+
+
+  useEffect(() => {
+    // The subjects are already sorted by order in getAllSubjectsWithUITweaks
+    // If client-side sorting or filtering were needed in the future, it could be done here.
+    setSubjects(initialSubjects);
+  }, [initialSubjects]);
 
   return (
     <header className="border-b border-gray-700 p-3 sm:p-4">
@@ -28,16 +45,16 @@ export default function Header() {
         {/* Селектор предметов */}
         <select
           className="w-full sm:w-auto px-3 py-1 rounded bg-gray-800 text-white border border-gray-600"
-          defaultValue=""
+          value={currentSubjectSlug} // Controlled component based on current route
           onChange={e => {
             if (e.target.value) window.location.href = `/${e.target.value}`;
           }}
         >
-          <option value="" disabled>
+          <option value="" disabled={!!currentSubjectSlug}> {/* Disable default if a subject is selected */}
             Выберите предмет
           </option>
           {subjects.map(s => (
-            <option key={s.slug} value={s.slug}>
+            <option key={s.slug} value={s.slug} className={s.color}>
               {s.icon ? `${s.icon} ` : ""}
               {s.label}
             </option>
