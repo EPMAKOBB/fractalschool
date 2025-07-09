@@ -3,11 +3,11 @@
 import useSWR from "swr";
 import { DashboardData } from "@/types/dashboard";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export function useDashboardData() {
   const { data, error, isLoading, mutate } = useSWR<DashboardData>(
-    "/api/dashboard",
+    "/api/lk",           // 💡 новый путь
     fetcher,
   );
   return { data, error, isLoading, mutate };
