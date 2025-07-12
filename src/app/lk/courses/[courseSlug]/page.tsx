@@ -1,26 +1,29 @@
 // src/app/lk/courses/[courseSlug]/page.tsx
+
 import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import ProgressBar from "../../components/ProgressBar";
 import GenerateVariantButton from "../../components/GenerateVariantButton";
 
-interface Props {
+// Типизация params строго по Next.js 13/14 app router
+interface PageProps {
   params: { courseSlug: string };
 }
 
-export default async function CourseDetailPage({ params }: Props) {
+export default async function Page({ params }: PageProps) {
   const supabase = await createClient();
   const { courseSlug } = params;
 
-  /* найти курс */
+  // Получить курс
   const { data: course } = await supabase
     .from("courses")
     .select("id, title")
     .eq("slug", courseSlug)
     .maybeSingle();
-  if (!course) notFound();
 
-  /* прогресс по модулям */
+  if (!course) return notFound();
+
+  // Прогресс по модулям
   const { data: moduleRows } = await supabase
     .from("v_user_module_progress")
     .select("*")
@@ -34,7 +37,7 @@ export default async function CourseDetailPage({ params }: Props) {
           variantName="тренировочный модуль"
           onGenerate={async () => {
             "use server";
-            /* TODO: вызвать action генерации модуля */
+            // TODO: вызвать action генерации модуля
           }}
         />
       </header>
