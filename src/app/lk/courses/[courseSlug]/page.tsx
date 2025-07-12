@@ -5,10 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import ProgressBar from "../../components/ProgressBar";
 import GenerateVariantButton from "../../components/GenerateVariantButton";
 
-// Типизация params строго по Next.js 13/14 app router
-interface PageProps {
-  params: { courseSlug: string };
-}
+
 
 export default async function Page({ params }: { params: { courseSlug: string } }) {
   const supabase = await createClient();
