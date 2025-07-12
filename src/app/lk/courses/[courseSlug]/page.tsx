@@ -10,7 +10,7 @@ interface PageProps {
   params: { courseSlug: string };
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params }: { params: { courseSlug: string } }) {
   const supabase = await createClient();
   const { courseSlug } = params;
 
