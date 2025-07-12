@@ -4,30 +4,25 @@
 import Link from "next/link";
 import { AuthNav } from "./AuthNav";
 import { subjectsMeta } from "../config/subjectsMeta";
-
-/**
- * Шапка сайта.
- * Показывает селектор предметов на основе `subjectsMeta`
- * (чисто UI-метаданные: slug, label, icon, порядок).
- */
+import ThemeToggle from "./ThemeToggle";
+import { Button } from "@/components/ui/button";
 
 export default function Header() {
-  /* сортируем, если задано поле order */
   const subjects = [...subjectsMeta].sort(
     (a, b) => (a.order ?? 99) - (b.order ?? 99),
   );
 
   return (
-    <header className="border-b border-gray-700 p-3 sm:p-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+    <header className="border-b border-border/60 bg-background/80 backdrop-blur sticky top-0 z-50">
+      <div className="mx-auto max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-2 p-3 sm:p-4">
         {/* Логотип */}
-        <h1 className="text-lg sm:text-xl font-bold whitespace-pre-line">
-          <Link href="/">[Ф]рактал&nbsp;— подготовка{'\n'}к&nbsp;ЕГЭ&nbsp;и&nbsp;ОГЭ</Link>
-        </h1>
+        <Link href="/" className="font-bold text-lg sm:text-xl whitespace-pre-line hover:underline">
+          [Ф]рактал&nbsp;— подготовка{'\n'}к&nbsp;ЕГЭ&nbsp;и&nbsp;ОГЭ
+        </Link>
 
         {/* Селектор предметов */}
         <select
-          className="w-full sm:w-auto px-3 py-1 rounded bg-gray-800 text-white border border-gray-600"
+          className="w-full sm:w-auto px-3 py-1 rounded-md border bg-muted text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           defaultValue=""
           onChange={e => {
             if (e.target.value) window.location.href = `/${e.target.value}`;
@@ -44,8 +39,9 @@ export default function Header() {
           ))}
         </select>
 
-        {/* Навигация: ЛК / Вход */}
-        <nav className="flex justify-end w-full sm:w-auto">
+        {/* Навигация и ThemeToggle */}
+        <nav className="flex gap-2 items-center w-full sm:w-auto justify-end">
+          <ThemeToggle />
           <AuthNav />
         </nav>
       </div>

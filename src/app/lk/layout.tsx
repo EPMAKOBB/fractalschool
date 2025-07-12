@@ -1,25 +1,19 @@
 // src/app/lk/layout.tsx
-import Link from "next/link";
 import { ReactNode } from "react";
+import LkTabs from "./components/LkTabs";
 
-export default function LKLayout({ children }: { children: ReactNode }) {
+export const metadata = {
+  title: "Личный кабинет",
+};
+
+export default function LkLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-56 border-r p-4 space-y-3">
-        <nav className="flex flex-col gap-2">
-          <Link href="/lk" className="hover:underline">
-            Предметы
-          </Link>
-          <Link href="/lk/courses" className="hover:underline">
-            Курсы
-          </Link>
-          <Link href="/lk/profile" className="hover:underline">
-            Профиль
-          </Link>
-        </nav>
-      </aside>
+    <div className="flex min-h-screen flex-col">
+      <header className="border-b px-4 py-2">
+        <LkTabs />
+      </header>
 
-      <main className="flex-1 p-6">{children}</main>
+      <main className="flex-1 px-4 py-6">{children}</main>
     </div>
   );
 }
