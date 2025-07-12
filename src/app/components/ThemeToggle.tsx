@@ -1,14 +1,15 @@
 // src/app/components/ThemeToggle.tsx
-
 "use client";
 import { useEffect, useState } from "react";
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState<boolean>(() => {
-    if (typeof window !== "undefined")
-      return document.documentElement.classList.contains("dark");
-    return false;
-  });
+  const [dark, setDark] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved) setDark(saved === "dark");
+    else setDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }, []);
 
   useEffect(() => {
     if (dark) {
@@ -20,18 +21,23 @@ export default function ThemeToggle() {
     }
   }, [dark]);
 
-  useEffect(() => {
-    // При инициализации, если есть сохранённая тема — применить её
-    const saved = localStorage.getItem("theme");
-    if (saved) setDark(saved === "dark");
-  }, []);
-
   return (
     <button
-      className="rounded px-3 py-1 border text-sm"
+      type="button"
       onClick={() => setDark((v) => !v)}
+      className="
+        inline-flex items-center justify-center
+        rounded-md border border-border bg-background
+        p-2 text-xl transition
+        hover:bg-muted hover:border-primary
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+        cursor-pointer
+      "
+      aria-label={dark ? "Включить светлую тему" : "Включить тёмную тему"}
+      title={dark ? "Сменить на светлую тему" : "Сменить на тёмную тему"}
+      style={{ minWidth: "2.5rem" }}
     >
-      {dark ? "🌙 Тёмная" : "☀️ Светлая"}
+      {dark ? "🌙" : "☀️"}
     </button>
   );
 }
