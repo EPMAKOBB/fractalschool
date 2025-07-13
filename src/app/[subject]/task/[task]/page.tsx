@@ -5,7 +5,7 @@ import { subjectsMeta } from "../../../config/subjectsMeta";
 import TaskCard from "../../../components/TaskCard";
 
 type Props = {
-  params: Promise<{ subject: string; task: string }>;
+  params: { subject: string; task: string }; // No longer a Promise
 };
 
 export default async function TaskPage(props: Props) {

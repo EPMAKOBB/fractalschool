@@ -11,7 +11,7 @@ import Link from "next/link";
  */
 
 type Props = {
-  params: Promise<{ subject: string }>;
+  params: { subject: string }; // No longer a Promise, Next.js handles this for async components
 };
 
 export default async function SubjectPage(props: Props) {
