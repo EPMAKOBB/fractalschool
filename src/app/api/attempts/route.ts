@@ -1,10 +1,19 @@
 // src/app/api/attempts/route.ts
 import { NextResponse } from "next/server";
-import { supabase } from "../../../lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+  }
+
   // 1) Разбираем тело запроса
-  const { variantId, answer, userId } = await request.json();
+  const { variantId, answer } = await request.json();
 
   // 2) Получаем правильный ответ из таблицы variants
   const { data: variant, error: varErr } = await supabase
@@ -16,7 +25,7 @@ export async function POST(request: Request) {
   if (varErr || !variant) {
     return NextResponse.json(
       { error: varErr?.message || "Variant not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -30,7 +39,7 @@ export async function POST(request: Request) {
     .insert([
       {
         variant_id: variantId,
-        user_id: userId,
+        user_id: session.user.id,
         answer: answer.toString(),
         is_correct: isCorrect,
       },
@@ -39,10 +48,7 @@ export async function POST(request: Request) {
     .single();
 
   if (insertErr) {
-    return NextResponse.json(
-      { error: insertErr.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: insertErr.message }, { status: 500 });
   }
 
   // 4) Отдаём клиенту результат
