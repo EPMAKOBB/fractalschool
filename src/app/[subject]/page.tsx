@@ -1,7 +1,7 @@
 // src/app/[subject]/page.tsx
 
 import { subjectsMeta } from "../config/subjectsMeta";
-import { supabase } from "../../lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 
 /**
@@ -15,6 +15,7 @@ type Props = {
 };
 
 export default async function SubjectPage(props: Props) {
+  const supabase = await createClient();
   /* ---------- slug из маршрута ---------- */
   const { subject } = await props.params;
 
