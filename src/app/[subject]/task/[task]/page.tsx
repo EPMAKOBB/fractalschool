@@ -5,12 +5,12 @@ import { subjectsMeta } from "../../../config/subjectsMeta";
 import TaskCard from "../../../components/TaskCard";
 
 type Props = {
-  params: { subject: string; task: string }; // No longer a Promise
+  params: { subject: string; task: string }; // params are synchronous
 };
 
-export default async function TaskPage(props: Props) {
+export default async function TaskPage({ params }: Props) {
   /* ---------- Маршрут ---------- */
-  const { subject, task } = await props.params; // task — uuid-строка
+  const { subject, task } = params; // task — uuid-строка
 
   /* ---------- Предмет ---------- */
   const { data: subj, error: subjErr } = await supabase

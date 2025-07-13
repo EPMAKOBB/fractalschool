@@ -6,14 +6,14 @@ import { subjectsMeta } from "../../../config/subjectsMeta";
 import TaskCard from "../../../components/TaskCard";
 
 type Props = {
-  params: { subject: string; type: string }; // No longer a Promise
+  params: { subject: string; type: string }; // params are synchronous
 };
 
-export default async function TypeTasksPage(props: Props) {
+export default async function TypeTasksPage({ params }: Props) {
   // --- параметры маршрута ---
 
 
-  const { subject, type } = await props.params;
+  const { subject, type } = params;
   const typeNum = Number(type);
 
   if (Number.isNaN(typeNum) || typeNum <= 0) {

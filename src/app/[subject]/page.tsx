@@ -11,12 +11,12 @@ import Link from "next/link";
  */
 
 type Props = {
-  params: { subject: string }; // No longer a Promise, Next.js handles this for async components
+  params: { subject: string }; // Next.js passes params synchronously
 };
 
-export default async function SubjectPage(props: Props) {
+export default async function SubjectPage({ params }: Props) {
   /* ---------- slug из маршрута ---------- */
-  const { subject } = await props.params;
+  const { subject } = params;
 
   /* ---------- предмет из БД ---------- */
   const { data: subjRow, error: subjErr } = await supabase

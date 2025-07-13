@@ -6,12 +6,12 @@ import { Suspense } from "react";
 
 
 type Props = {
-  params: { subject: string; variant: string }; // No longer a Promise
+  params: { subject: string; variant: string }; // params are synchronous
 };
 
-export default async function VariantPage(props: Props) {
+export default async function VariantPage({ params }: Props) {
   /* ---------- параметры маршрута ---------- */
-  const { subject, variant } = await props.params;
+  const { subject, variant } = params;
 
   /* ---------- предмет ---------- */
   const { data: subj, error: subjErr } = await supabase
