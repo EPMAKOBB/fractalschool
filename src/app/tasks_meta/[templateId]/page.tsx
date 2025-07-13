@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { supabase } from "../../../lib/supabase";
+import { supabase } from "@/utils/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 
 interface Variant {

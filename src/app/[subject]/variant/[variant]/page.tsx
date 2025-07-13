@@ -1,15 +1,16 @@
 // src/app/[subject]/variant/[variant]/page.tsx
 
-import { supabase } from "../../../../lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 import { subjectsMeta } from "../../../config/subjectsMeta";
 import { Suspense } from "react";
 
 
 type Props = {
-  params: { subject: string; variant: string }; // No longer a Promise
+  params: Promise<{ subject: string; variant: string }>;
 };
 
 export default async function VariantPage(props: Props) {
+  const supabase = await createClient();
   /* ---------- параметры маршрута ---------- */
   const { subject, variant } = await props.params;
 

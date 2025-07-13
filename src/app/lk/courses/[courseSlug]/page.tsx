@@ -7,9 +7,9 @@ import GenerateVariantButton from "../../components/GenerateVariantButton";
 
 
 
-export default async function Page({ params }: { params: { courseSlug: string } }) {
+export default async function Page({ params }: { params: Promise<{ courseSlug: string }> }) {
   const supabase = await createClient();
-  const { courseSlug } = params;
+  const { courseSlug } = await params;
 
   // Получить курс
   const { data: course } = await supabase

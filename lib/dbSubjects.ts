@@ -1,10 +1,11 @@
 // lib/dbSubjects.ts
-import { supabase } from "@/lib/supabase";
-import type { Database } from "@/types_db";
+import { createClient } from "@/utils/supabase/server";
+import type { Database } from "@/types/db";
 
 const cache = new Map<string, Database["public"]["Tables"]["subjects"]["Row"]>();
 
 export async function getSubject(slug: string) {
+  const supabase = await createClient();
   if (cache.has(slug)) return cache.get(slug)!;
   const { data, error } = await supabase
     .from("subjects")

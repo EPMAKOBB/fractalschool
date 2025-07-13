@@ -1,15 +1,16 @@
 // src/app/[subject]/task/[task]/page.tsx
 
-import { supabase } from "../../../../lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 import { subjectsMeta } from "../../../config/subjectsMeta";
 import TaskCard from "../../../components/TaskCard";
 
 type Props = {
-  params: { subject: string; task: string }; // No longer a Promise
+  params: Promise<{ subject: string; task: string }>;
 };
 
 export default async function TaskPage(props: Props) {
   /* ---------- Маршрут ---------- */
+  const supabase = await createClient();
   const { subject, task } = await props.params; // task — uuid-строка
 
   /* ---------- Предмет ---------- */
