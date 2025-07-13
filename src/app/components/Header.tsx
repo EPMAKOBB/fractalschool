@@ -21,7 +21,7 @@ export default function Header() {
 
   return (
     <header className="border-b border-border/60 bg-background/80 backdrop-blur sticky top-0 z-50">
-      <div className="max-w-5xl mx-auto flex items-center justify-between px-3 py-2 sm:px-6 sm:py-3">
+      <div className="max-w-5xl mx-auto flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between px-3 py-2 sm:px-6 sm:py-3">
         {/* Логотип (слева) */}
         <Link
           href="/"
