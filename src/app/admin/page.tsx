@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "@/utils/supabase/client";
 
 type Column = {
   column_name: string;

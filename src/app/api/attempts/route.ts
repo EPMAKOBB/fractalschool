@@ -1,8 +1,9 @@
 // src/app/api/attempts/route.ts
 import { NextResponse } from "next/server";
-import { supabase } from "../../../lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
   // 1) Разбираем тело запроса
   const { variantId, answer, userId } = await request.json();
 

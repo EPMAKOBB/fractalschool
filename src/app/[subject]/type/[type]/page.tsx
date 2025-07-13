@@ -1,7 +1,7 @@
 // src/app/[subject]/type/[type]/page.tsx
 
 
-import { supabase } from "../../../../lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 import { subjectsMeta } from "../../../config/subjectsMeta";
 import TaskCard from "../../../components/TaskCard";
 
@@ -11,6 +11,8 @@ type Props = {
 
 export default async function TypeTasksPage(props: Props) {
   // --- параметры маршрута ---
+
+  const supabase = await createClient();
 
 
   const { subject, type } = await props.params;

@@ -1,6 +1,6 @@
 // src/app/api/generate/route.ts
 // import { NextResponse } from "next/server";
-// import { supabase } from "../../../lib/supabase";
+// import { createClient } from "@/utils/supabase/server";
 
 // export async function POST(request: Request) {
 //   const { templateId } = await request.json();
@@ -44,3 +44,4 @@
 //   // Возвращаем созданный вариант
 //   return NextResponse.json(variant);
 // }
+export {}
