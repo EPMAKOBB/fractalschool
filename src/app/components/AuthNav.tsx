@@ -2,19 +2,25 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/utils/supabase/client";
 
 export function AuthNav() {
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
 
   useEffect(() => {
+    let mounted = true;
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuth(!!session);
+      if (mounted) setIsAuth(!!session);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_, session) => setIsAuth(!!session),
+      (_, session) => {
+        if (mounted) setIsAuth(!!session);
+      }
     );
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (isAuth === null) return <span className="text-gray-500">…</span>;
