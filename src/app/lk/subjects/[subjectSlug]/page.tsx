@@ -6,11 +6,11 @@ import TopicProgress from "./components/TopicProgress";
 import GenerateVariantButton from "../../components/GenerateVariantButton";
 
 interface Props {
-  params: { subjectSlug: string };
+  params: Promise<{ subjectSlug: string }>;
 }
 
 export default async function SubjectDetailPage({ params }: Props) {
-  const { subjectSlug } = params;
+  const { subjectSlug } = await params;
   const supabase = await createClient();
 
   /* Находим сам предмет */

@@ -62,7 +62,7 @@ export default function AdminPage() {
   useEffect(() => {
     async function fetchAllRows() {
       setLoading(true);
-      let query = supabase.from(selectedTable).select("*");
+      let query = supabase.from(selectedTable as any).select("*");
       if (sortOption.field) {
         query = query.order(sortOption.field, { ascending: sortOption.asc });
       }
@@ -114,10 +114,10 @@ export default function AdminPage() {
     const filteredRow = Object.fromEntries(
       Object.entries(newRow).filter(([key, v]) => v !== "" && key !== "id" && key !== "created_at")
     );
-    const { error } = await supabase.from(selectedTable).insert([filteredRow]);
+      const { error } = await supabase.from(selectedTable as any).insert([filteredRow]);
     if (!error) {
       setNewRow({});
-      let query = supabase.from(selectedTable).select("*");
+      let query = supabase.from(selectedTable as any).select("*");
       if (sortOption.field) {
         query = query.order(sortOption.field, { ascending: sortOption.asc });
       }
@@ -129,8 +129,8 @@ export default function AdminPage() {
   };
 
   const handleDeleteRow = async (id: number) => {
-    await supabase.from(selectedTable).delete().eq("id", id);
-    let query = supabase.from(selectedTable).select("*");
+    await supabase.from(selectedTable as any).delete().eq("id", id);
+    let query = supabase.from(selectedTable as any).select("*");
     if (sortOption.field) {
       query = query.order(sortOption.field, { ascending: sortOption.asc });
     }
@@ -147,10 +147,10 @@ export default function AdminPage() {
     const filteredRow = Object.fromEntries(
       Object.entries(editRow).filter(([_, v]) => v !== "")
     );
-    await supabase.from(selectedTable).update(filteredRow).eq("id", id);
+    await supabase.from(selectedTable as any).update(filteredRow).eq("id", id);
     setEditRowId(null);
     setEditRow({});
-    let query = supabase.from(selectedTable).select("*");
+    let query = supabase.from(selectedTable as any).select("*");
     if (sortOption.field) {
       query = query.order(sortOption.field, { ascending: sortOption.asc });
     }

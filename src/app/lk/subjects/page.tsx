@@ -30,9 +30,7 @@ export default async function SubjectsPage() {
     .order("accuracy", { ascending: true })
     .limit(3);
 
-  const { data: recRows } = await supabase.rpc<
-    { task_id: string; score: number }[]
-  >("fn_recommend_tasks", {
+  const { data: recRows } = await supabase.rpc("fn_recommend_tasks", {
     _user_id: session.user.id,
     _limit: 5,
   });
@@ -76,7 +74,7 @@ export default async function SubjectsPage() {
         <section>
           <h2 className="mb-4 text-xl font-semibold">Персональные задачи-рекомендации</h2>
           <ul className="list-disc pl-6">
-            {recRows.map((r) => (
+            {recRows.map((r: any) => (
               <li key={r.task_id}>
                 <Link href={`/tasks/${r.task_id}`} className="text-primary hover:underline">
                   Задача #{r.task_id}

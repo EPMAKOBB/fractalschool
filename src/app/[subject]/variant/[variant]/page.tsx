@@ -6,7 +6,7 @@ import { Suspense } from "react";
 
 
 type Props = {
-  params: { subject: string; variant: string }; // No longer a Promise
+  params: Promise<{ subject: string; variant: string }>;
 };
 
 export default async function VariantPage(props: Props) {
