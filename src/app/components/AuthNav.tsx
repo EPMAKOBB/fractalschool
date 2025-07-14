@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
+import useUserProfile from "@/app/lk/components/useUserProfile";
 
 export function AuthNav() {
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
 
+  // Подписка на изменения сессии
   useEffect(() => {
     let mounted = true;
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -23,15 +25,30 @@ export function AuthNav() {
     };
   }, []);
 
+  // Получаем профиль только если авторизованы
+  const { profile, isLoading } = useUserProfile();
+
   if (isAuth === null) return <span className="text-gray-500">…</span>;
 
-  return isAuth ? (
+  if (!isAuth) {
+    return (
+      <Link href="/login" className="hover:underline">
+        Вход / Регистрация
+      </Link>
+    );
+  }
+
+  // Показываем имя, если оно заполнено
+  const label =
+    (profile?.name && profile.name.trim().length > 0)
+      ? profile.name
+      : "Личный кабинет";
+
+  return (
     <Link href="/lk" className="hover:underline">
-      Личный кабинет
-    </Link>
-  ) : (
-    <Link href="/login" className="hover:underline">
-      Вход / Регистрация
+      {isLoading ? "…" : label}
     </Link>
   );
 }
+
+export default AuthNav;

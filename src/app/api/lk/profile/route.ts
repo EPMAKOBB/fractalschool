@@ -11,24 +11,45 @@ export const dynamic = "force-dynamic";
 export async function GET(_req: NextRequest) {
   const supabase = await createClient();
   const {
-    data: { session },
-    error: sessErr,
-  } = await supabase.auth.getSession();
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  if (sessErr) return NextResponse.json({ error: "session_failed" }, { status: 500 });
-  if (!session) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+  if (userError)
+    return NextResponse.json({ error: "session_failed" }, { status: 500 });
+  if (!user)
+    return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
 
-  const userId = session.user.id;
-  const { data: profile, error } = await supabase
-    .schema("app") // user_profiles находится в схеме app
+  const userId = user.id;
+  let { data: profile } = await supabase
+    .schema("app")
     .from("user_profiles")
     .select("user_id, name, nickname, avatar_url, bio, created_at")
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (error) {
-    console.error("user_profiles", error);
-    return NextResponse.json({ error: "profile_failed" }, { status: 500 });
+  // Если нет профиля — создать его (можно убрать, если есть триггер)
+  if (!profile) {
+    await supabase
+      .schema("app")
+      .from("user_profiles")
+      .insert({
+        user_id: userId,
+        name: null,
+        nickname: null,
+        avatar_url: null,
+        bio: null,
+        created_at: new Date().toISOString(),
+      });
+    // Повторно получить профиль
+    profile = (
+      await supabase
+        .schema("app")
+        .from("user_profiles")
+        .select("user_id, name, nickname, avatar_url, bio, created_at")
+        .eq("user_id", userId)
+        .maybeSingle()
+    ).data;
   }
 
   return NextResponse.json({ profile });
@@ -37,17 +58,45 @@ export async function GET(_req: NextRequest) {
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const {
-    data: { session },
-    error: sessErr,
-  } = await supabase.auth.getSession();
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  if (sessErr) return NextResponse.json({ error: "session_failed" }, { status: 500 });
-  if (!session) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+  if (userError)
+    return NextResponse.json({ error: "session_failed" }, { status: 500 });
+  if (!user)
+    return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
 
-  const userId = session.user.id;
-  const body = await req.json();
-  const { name, nickname, avatar_url, bio } = body ?? {};
+  const userId = user.id;
+  let body: any = {};
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Некорректный формат данных" },
+      { status: 400 }
+    );
+  }
 
+  let { name, nickname, avatar_url, bio } = body ?? {};
+
+  // Никнейм: только латиница, цифры, подчёркивание, длина 3–32, lower case
+  if (nickname) {
+    nickname = nickname.trim().toLowerCase();
+    if (!/^[a-zA-Z0-9_]{3,32}$/.test(nickname)) {
+      return NextResponse.json(
+        {
+          error:
+            "Никнейм может содержать только латинские буквы, цифры и нижнее подчёркивание, 3–32 символа.",
+        },
+        { status: 400 }
+      );
+    }
+  } else {
+    nickname = null;
+  }
+
+  // Обновляем/создаём профиль (upsert)
   const { error } = await supabase
     .schema("app")
     .from("user_profiles")
@@ -59,10 +108,29 @@ export async function POST(req: NextRequest) {
       bio,
     });
 
-  if (error) {
-    console.error("profile upsert", error);
-    return NextResponse.json({ error: "profile_update_failed" }, { status: 500 });
+  // Проверка ошибки уникальности nickname (Postgres code 23505)
+  if (error?.code === "23505") {
+    return NextResponse.json(
+      { error: "Этот никнейм уже занят." },
+      { status: 409 }
+    );
   }
 
-  return NextResponse.json({ ok: true });
+  if (error) {
+    console.error("profile upsert", error);
+    return NextResponse.json(
+      { error: "profile_update_failed" },
+      { status: 500 }
+    );
+  }
+
+  // Возвращаем обновлённый профиль
+  const { data: profile } = await supabase
+    .schema("app")
+    .from("user_profiles")
+    .select("user_id, name, nickname, avatar_url, bio, created_at")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  return NextResponse.json({ profile });
 }
