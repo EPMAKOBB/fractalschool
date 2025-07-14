@@ -11,16 +11,16 @@ export const dynamic = "force-dynamic";
 export async function GET(_req: NextRequest) {
   const supabase = await createClient();
   const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+    data: { session },
+    error: sessErr,
+  } = await supabase.auth.getSession();
 
-  if (userError)
+  if (sessErr)
     return NextResponse.json({ error: "session_failed" }, { status: 500 });
-  if (!user)
+  if (!session)
     return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
 
-  const userId = user.id;
+  const userId = session.user.id;
   let { data: profile } = await supabase
     .schema("app")
     .from("user_profiles")
@@ -58,24 +58,21 @@ export async function GET(_req: NextRequest) {
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+    data: { session },
+    error: sessErr,
+  } = await supabase.auth.getSession();
 
-  if (userError)
+  if (sessErr)
     return NextResponse.json({ error: "session_failed" }, { status: 500 });
-  if (!user)
+  if (!session)
     return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
 
-  const userId = user.id;
+  const userId = session.user.id;
   let body: any = {};
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json(
-      { error: "Некорректный формат данных" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Некорректный формат данных" }, { status: 400 });
   }
 
   let { name, nickname, avatar_url, bio } = body ?? {};
