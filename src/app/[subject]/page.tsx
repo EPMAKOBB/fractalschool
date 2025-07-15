@@ -98,11 +98,7 @@ const typeNums = Array.from(
         ) : (
           <div className="flex flex-wrap gap-2">
             {typeNums.map(n => (
-              <Button
-                asChild
-                key={n}
-                className="px-3 py-1 border rounded bg-gray-800 hover:bg-gray-700"
-              >
+              <Button asChild key={n} variant="outline" size="sm">
                 <Link href={`/${subject}/type/${n}`}>Тип {n}</Link>
               </Button>
             ))}
