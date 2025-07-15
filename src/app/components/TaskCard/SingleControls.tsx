@@ -1,5 +1,6 @@
 // src/app/components/TaskCard/SingleControls.tsx
 import clsx from "clsx";
+import { Button } from "@/components/ui/button";
 
 export default function SingleControls({
   onCheck,
@@ -12,12 +13,12 @@ export default function SingleControls({
 }) {
   return (
     <div className="flex flex-col gap-2 mb-2">
-      <button
-        className="px-3 py-1 rounded text-white bg-blue-700 hover:bg-blue-800 w-fit"
+      <Button
         onClick={onCheck}
+        className="px-3 py-1 w-fit bg-blue-700 text-white hover:bg-blue-800"
       >
         Проверить ответ
-      </button>
+      </Button>
 
       {score !== null && (
         <span
