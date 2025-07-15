@@ -3,6 +3,7 @@
 import { subjectsMeta } from "../config/subjectsMeta";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 /**
  * Динамическая страница предмета `/[subject]`
@@ -75,13 +76,15 @@ const typeNums = Array.from(
         ) : (
           <div className="flex flex-wrap gap-2">
             {variants.map((v, i) => (
-              <Link
+              <Button
+                asChild
                 key={v.id}
-                href={`/${subject}/variant/${v.slug}`}
                 className="px-3 py-1 border rounded bg-gray-800 hover:bg-gray-700"
               >
-                {v.title || `Вариант ${i + 1}`}
-              </Link>
+                <Link href={`/${subject}/variant/${v.slug}`}> 
+                  {v.title || `Вариант ${i + 1}`}
+                </Link>
+              </Button>
             ))}
           </div>
         )}
@@ -95,13 +98,13 @@ const typeNums = Array.from(
         ) : (
           <div className="flex flex-wrap gap-2">
             {typeNums.map(n => (
-              <Link
+              <Button
+                asChild
                 key={n}
-                href={`/${subject}/type/${n}`}
                 className="px-3 py-1 border rounded bg-gray-800 hover:bg-gray-700"
               >
-                Тип {n}
-              </Link>
+                <Link href={`/${subject}/type/${n}`}>Тип {n}</Link>
+              </Button>
             ))}
           </div>
         )}
