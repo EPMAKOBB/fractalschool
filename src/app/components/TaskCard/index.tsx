@@ -39,7 +39,7 @@ export default function TaskCard(props: TaskCardProps) {
     };
 
     return (
-      <div className="border rounded-lg bg-gray-800 p-4 mb-4">
+      <div className="border rounded-lg bg-card text-card-foreground p-4 mb-4">
         <TaskHead task={task} subject={subject} />
         <TaskStatement html={task.body_md} />
         <TaskInput
@@ -67,7 +67,7 @@ export default function TaskCard(props: TaskCardProps) {
 
   return (
     <div
-      className={`border rounded-lg bg-gray-800 p-4 mb-4 ${
+      className={`border rounded-lg bg-card text-card-foreground p-4 mb-4 ${
         disabled ? "opacity-60 pointer-events-none" : ""
       }`}
     >
