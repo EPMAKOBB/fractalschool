@@ -1,5 +1,6 @@
 // src/app/components/TaskCard/TaskInput.tsx
 import type { UserAnswer } from "./utils/helpers";
+import { Input } from "@/components/ui/input";
 
 /** Свитчер всех форм ввода по answerType. */
 export default function TaskInput({
@@ -19,9 +20,9 @@ export default function TaskInput({
       return (
         <div className="flex gap-2">
           {[0, 1].map(idx => (
-            <input
+            <Input
               key={idx}
-              className="border rounded px-2 py-1"
+              className="flex-1"
               value={(answer as string[])[idx] ?? ""}
               onChange={e => {
                 const next = [...(answer as string[])];
@@ -44,8 +45,8 @@ export default function TaskInput({
               <tr key={r}>
                 {[0, 1].map(c => (
                   <td key={c} className="p-1">
-                    <input
-                      className="border rounded px-2 py-1 w-16"
+                    <Input
+                      className="w-16"
                       value={(answer as string[][])[r]?.[c] ?? ""}
                       onChange={e => {
                         const next = (answer as string[][]).map(row => [
@@ -67,8 +68,8 @@ export default function TaskInput({
 
     default:
       return (
-        <input
-          className="border rounded px-2 py-1 w-full"
+        <Input
+          className="w-full"
           value={(answer as string) ?? ""}
           onChange={e => onChange(e.target.value)}
           placeholder="Ваш ответ"

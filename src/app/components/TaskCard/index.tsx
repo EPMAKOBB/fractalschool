@@ -2,6 +2,7 @@
 
 "use client";
 import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import type {
   Task,
   UserAnswer,
@@ -39,26 +40,28 @@ export default function TaskCard(props: TaskCardProps) {
     };
 
     return (
-      <div className="border rounded-lg bg-card text-card-foreground p-4 mb-4">
-        <TaskHead task={task} subject={subject} />
-        <TaskStatement html={task.body_md} />
-        <TaskInput
-          answerType={answerType}
-          answer={userAnswer}
-          onChange={setUserAnswer}
-        />
-        <SingleControls
-          onCheck={handleCheck}
-          score={score}
-          maxScore={maxScore}
-        />
-        <SolutionBlock
-          open={showSolution}
-          onToggle={() => setShowSolution(s => !s)}
-          answer={task.answer_json}
-          solution={task.solution_md}
-        />
-      </div>
+      <Card className="mb-4">
+        <CardContent className="space-y-4">
+          <TaskHead task={task} subject={subject} />
+          <TaskStatement html={task.body_md} />
+          <TaskInput
+            answerType={answerType}
+            answer={userAnswer}
+            onChange={setUserAnswer}
+          />
+          <SingleControls
+            onCheck={handleCheck}
+            score={score}
+            maxScore={maxScore}
+          />
+          <SolutionBlock
+            open={showSolution}
+            onToggle={() => setShowSolution(s => !s)}
+            answer={task.answer_json}
+            solution={task.solution_md}
+          />
+        </CardContent>
+      </Card>
     );
   }
 
@@ -66,19 +69,19 @@ export default function TaskCard(props: TaskCardProps) {
   const { value, onChange, disabled } = props as VariantModeProps;
 
   return (
-    <div
-      className={`border rounded-lg bg-card text-card-foreground p-4 mb-4 ${
-        disabled ? "opacity-60 pointer-events-none" : ""
-      }`}
+    <Card
+      className={`mb-4 ${disabled ? "opacity-60 pointer-events-none" : ""}`}
     >
-      <TaskHead task={task} subject={subject} />
-      <TaskStatement html={task.body_md} />
-      <TaskInput
-        answerType={answerType}
-        answer={value}
-        onChange={onChange}
-        disabled={disabled}
-      />
-    </div>
+      <CardContent className="space-y-4">
+        <TaskHead task={task} subject={subject} />
+        <TaskStatement html={task.body_md} />
+        <TaskInput
+          answerType={answerType}
+          answer={value}
+          onChange={onChange}
+          disabled={disabled}
+        />
+      </CardContent>
+    </Card>
   );
 }
