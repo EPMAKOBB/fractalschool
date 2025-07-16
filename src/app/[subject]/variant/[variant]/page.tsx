@@ -2,7 +2,43 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { subjectsMeta } from "../../../config/subjectsMeta";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
+import TaskCard from "../../../components/TaskCard";
+import type {
+  Task,
+  UserAnswer,
+} from "../../../components/TaskCard/utils/helpers";
+import { getInitialAnswer } from "../../../components/TaskCard/utils/helpers";
+
+function VariantTaskList({ tasks, subject }: { tasks: Task[]; subject: string }) {
+  "use client";
+  const [answers, setAnswers] = React.useState<UserAnswer[]>(
+    tasks.map(t => getInitialAnswer(t.answer_type ?? "single"))
+  );
+
+  return (
+    <div className="flex flex-col gap-6">
+      {tasks.map((task, idx) => (
+        <TaskCard
+          key={task.id}
+          subject={subject}
+          task={{
+            ...task,
+            answer_type: task.answer_type ?? "single",
+            maxScore: task.maxScore ?? 1,
+          }}
+          mode="variant"
+          value={answers[idx]}
+          onChange={val => {
+            const next = [...answers];
+            next[idx] = val;
+            setAnswers(next);
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 
 type Props = {
@@ -92,7 +128,7 @@ export default async function VariantPage(props: Props) {
       </h1>
 
       <Suspense fallback={<div>Загрузка задач…</div>}>
-
+        <VariantTaskList tasks={orderedTasks} subject={subject} />
       </Suspense>
     </main>
   );
