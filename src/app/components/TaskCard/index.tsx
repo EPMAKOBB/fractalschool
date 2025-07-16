@@ -10,7 +10,7 @@ import type {
   VariantModeProps,
 } from "./utils/helpers";
 import { getInitialAnswer } from "./utils/helpers";
-import { checkAnswer } from "./utils/checkAnswer";
+import { checkAnswer } from "@/utils/checkAnswer";
 import TaskHead from "./TaskHead";
 import TaskStatement from "./TaskStatement";
 import TaskInput from "./TaskInput";
