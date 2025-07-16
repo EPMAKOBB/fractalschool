@@ -3,6 +3,7 @@
 "use client";
 
 import { useState } from "react";
+import { formatAnswer } from "@/utils/formatAnswer";
 
 // Типы для props (расширяй под свои нужды)
 type TaskResultViewProps = {
@@ -16,31 +17,6 @@ type TaskResultViewProps = {
   };
 };
 
-// Форматирование ответа (массивы, таблицы и строки)
-function formatAnswer(answer: any) {
-  if (Array.isArray(answer)) {
-    if (Array.isArray(answer[0])) {
-      return (
-        <table className="border border-gray-500 rounded my-2">
-          <tbody>
-            {answer.map((row: any[], i: number) => (
-              <tr key={i}>
-                {row.map((cell: any, j: number) => (
-                  <td key={j} className="px-2 py-1 border border-gray-400">
-                    {cell}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      );
-    } else {
-      return answer.join(", ");
-    }
-  }
-  return String(answer);
-}
 
 // Основной компонент
 export default function TaskResultView({ task, userAnswer, result }: TaskResultViewProps) {
