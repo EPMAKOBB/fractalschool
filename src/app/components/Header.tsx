@@ -4,7 +4,7 @@
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 import { AuthNav } from "./AuthNav";
-import { subjectsMeta } from "../config/subjectsMeta";
+import { subjectsMeta } from "@/app/config/subjectsMeta";
 import {
   Select,
   SelectContent,

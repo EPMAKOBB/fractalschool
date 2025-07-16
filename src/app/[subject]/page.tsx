@@ -1,6 +1,6 @@
 // src/app/[subject]/page.tsx
 
-import { subjectsMeta } from "../config/subjectsMeta";
+import { subjectsMeta } from "@/app/config/subjectsMeta";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

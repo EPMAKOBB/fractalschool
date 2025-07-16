@@ -2,8 +2,8 @@
 
 
 import { createClient } from "@/utils/supabase/server";
-import { subjectsMeta } from "../../../config/subjectsMeta";
-import TaskCard from "../../../components/TaskCard";
+import { subjectsMeta } from "@/app/config/subjectsMeta";
+import TaskCard from "@/app/components/TaskCard";
 
 type Props = {
   params: Promise<{ subject: string; type: string }>;
