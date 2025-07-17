@@ -1,16 +1,19 @@
 // src/app/components/TaskCard/SolutionBlock.tsx
 import { formatAnswer } from "./utils/helpers";
+import MdxRender from "../MdxRender";
 
 export default function SolutionBlock({
   open,
   onToggle,
   answer,
   solution,
+  solutionMdx,
 }: {
   open: boolean;
   onToggle: () => void;
   answer: any;
   solution: string | null;
+  solutionMdx?: string | null;
 }) {
   return (
     <>
@@ -26,10 +29,14 @@ export default function SolutionBlock({
           <div>
             <b>Ответ:</b> {formatAnswer(answer)}
           </div>
-          {solution && (
+          {(solutionMdx || solution) && (
             <div className="mt-2">
               <b>Решение:</b>
-              <div className="whitespace-pre-line">{solution}</div>
+              {solutionMdx ? (
+                <MdxRender source={solutionMdx} />
+              ) : (
+                <div className="whitespace-pre-line">{solution}</div>
+              )}
             </div>
           )}
         </div>
