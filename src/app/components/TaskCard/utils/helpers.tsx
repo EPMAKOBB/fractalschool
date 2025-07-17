@@ -8,9 +8,9 @@ export type UserAnswer = string | string[] | string[][];
 
 export type Task = {
   id: string;
-  body_md: string;
+  body_mdx: string;
   answer_json: any;
-  solution_md: string | null;
+  solution_mdx: string | null;
   type_num: number | null;
   answer_type?: string;
   maxScore?: number;
@@ -18,6 +18,9 @@ export type Task = {
   task_num_text?: string | null;
   notes_text?: string | null;
   source?: string | null;
+  tables_data?: any;
+  svg_data?: any;
+  img_urls?: string[] | null;
   // ... если будут ещё новые поля — добавь их сюда
 };
 
