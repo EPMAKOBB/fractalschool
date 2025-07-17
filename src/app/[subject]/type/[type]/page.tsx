@@ -44,7 +44,11 @@ export default async function TypeTasksPage(props: Props) {
   // --- задачи этого типа ---
   const { data: tasks, error: taskErr } = await supabase
     .from("tasks_static")
-    .select("*")
+    .select(
+      `id, type_num, body_mdx, solution_mdx, tables_data, svg_data, img_urls,
+       answer_json, answer_type, maxScore, task_num_text, notes_text, source,
+       difficulty`
+    )
     .eq("subject_id", subjRow.id)
     .eq("type_num", typeNum)
     .order("difficulty", { ascending: true });
