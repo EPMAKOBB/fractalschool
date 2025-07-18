@@ -82,61 +82,21 @@ export default function TaskTable({
     );
   };
 
-  return (
-    <div className={className}>
-      {tables.map((table, idx) => (
-        <table
-          key={idx}
-          className="border-collapse border border-gray-500 rounded my-4 mx-auto"
-        >
-          {captions[idx] && (
-            <caption className="text-sm mb-2">{captions[idx]}</caption>
-          )}
-          {headRows.length > 0 && (
-            <thead>
-              {headRows.map((row, r) => (
-                <tr key={r}>
-                  {row.map((cell, c) => {
-                    if (
-                      cell &&
-                      typeof cell === "object" &&
-                      !React.isValidElement(cell) &&
-                      "content" in cell
-                    ) {
-                      const { content, rowSpan, colSpan } = cell as any;
-                      return (
-                        <th
-                          key={c}
-                          rowSpan={rowSpan}
-                          colSpan={colSpan}
-                          className="border border-gray-400 px-2 py-1 text-center"
-                        >
-                          {content}
-                        </th>
-                      );
-                    }
-                    return (
-                      <th
-                        key={c}
-                        className="border border-gray-400 px-2 py-1 text-center"
-                      >
-                        {cell as any}
-                      </th>
-                    );
-                  })}
-                </tr>
-              ))}
-            </thead>
-          )}
-          <tbody>
-            {table.map((row, r) => (
-              <tr key={r}>{row.map((cell, c) => renderCell(cell, c))}</tr>
-            ))}
-          </tbody>
-        </table>
-      ))}
-    </div>
-  );
+
+/** Table cell description used by `tables_data` */
+export type TableCell = {
+  text: string;
+  rowspan?: number;
+  colspan?: number;
+  align?: "left" | "center" | "right";
+  highlighted?: boolean;
+};
+
+/** A table is represented as an array of rows */
+export type TableRow = TableCell[];
+export type Table = TableRow[];
+
+
 
 }
 
