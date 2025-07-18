@@ -9,20 +9,33 @@ export type UserAnswer = string | string[] | string[][];
 export type Task = {
   id: string;
 
-  body_mdx: string;
+  body_md: string;
+
+  /** MDX-представление условия */
+  body_mdx?: string | null;
   answer_json: any;
-  solution_mdx: string | null;
+  solution_md: string | null;
+  /** MDX-представление решения */
+
+  solution_mdx?: string | null;
 
   type_num: number | null;
   answer_type?: string;
   maxScore?: number;
-  // Добавить эти поля:
+  // Дополнительные поля
   task_num_text?: string | null;
   notes_text?: string | null;
   source?: string | null;
-  tables_data?: any;
-  svg_data?: any;
-  img_urls?: string[] | null;
+
+  /** Наборы данных для компонентов в MDX */
+  tables?: (string | number)[][][];
+  svgs?: {
+    width: number;
+    height: number;
+    elements: import("../../TaskComponents/SimpleSVG").SvgElement[];
+  }[];
+  images?: { src: string; alt?: string }[];
+
   // ... если будут ещё новые поля — добавь их сюда
 };
 

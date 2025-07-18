@@ -16,6 +16,10 @@ import TaskStatement from "./TaskStatement";
 import TaskInput from "./TaskInput";
 import SingleControls from "./SingleControls";
 import SolutionBlock from "./SolutionBlock";
+import MDX from "../TaskComponents/MDX";
+import TaskTable from "../TaskComponents/TaskTable";
+import { SimpleSVG } from "../TaskComponents/SimpleSVG";
+import TaskImage from "../TaskComponents/TaskImage";
 
 /** Карточка-обёртка: выбирает режим single / variant. */
 export default function TaskCard(props: TaskCardProps) {
@@ -44,7 +48,17 @@ export default function TaskCard(props: TaskCardProps) {
         <CardContent className="space-y-4">
           <TaskHead task={task} subject={subject} />
 
-          <TaskStatement html={task.body_mdx} />
+
+          {task.body_mdx ? (
+            <MDX
+              code={task.body_mdx}
+              components={{ TaskTable, SimpleSVG, TaskImage }}
+              scope={{ tables: task.tables, svgs: task.svgs, images: task.images }}
+            />
+          ) : (
+            <TaskStatement html={task.body_md} />
+          )}
+
 
           <TaskInput
             answerType={answerType}
@@ -61,7 +75,13 @@ export default function TaskCard(props: TaskCardProps) {
             onToggle={() => setShowSolution(s => !s)}
             answer={task.answer_json}
 
-            solution={task.solution_mdx}
+            solution={task.solution_md}
+
+            solutionMdx={task.solution_mdx ?? undefined}
+            tables={task.tables}
+            svgs={task.svgs}
+            images={task.images}
+
 
           />
         </CardContent>
@@ -79,7 +99,17 @@ export default function TaskCard(props: TaskCardProps) {
       <CardContent className="space-y-4">
         <TaskHead task={task} subject={subject} />
 
-        <TaskStatement html={task.body_mdx} />
+
+        {task.body_mdx ? (
+          <MDX
+            code={task.body_mdx}
+            components={{ TaskTable, SimpleSVG, TaskImage }}
+            scope={{ tables: task.tables, svgs: task.svgs, images: task.images }}
+          />
+        ) : (
+          <TaskStatement html={task.body_md} />
+        )}
+
 
         <TaskInput
           answerType={answerType}
