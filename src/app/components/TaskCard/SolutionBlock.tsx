@@ -1,9 +1,11 @@
 // src/app/components/TaskCard/SolutionBlock.tsx
 import { formatAnswer } from "./utils/helpers";
+
 import MDX from "../TaskComponents/MDX";
 import TaskTable from "../TaskComponents/TaskTable";
 import { SimpleSVG } from "../TaskComponents/SimpleSVG";
 import TaskImage from "../TaskComponents/TaskImage";
+
 
 export default function SolutionBlock({
   open,
@@ -11,13 +13,16 @@ export default function SolutionBlock({
   answer,
   solution,
   solutionMdx,
+
   tables,
   svgs,
   images,
+
 }: {
   open: boolean;
   onToggle: () => void;
   answer: any;
+
   solution?: string | null;
   solutionMdx?: string | null;
   tables?: (string | number)[][][];
@@ -27,6 +32,7 @@ export default function SolutionBlock({
     elements: import("../TaskComponents/SimpleSVG").SvgElement[];
   }[];
   images?: { src: string; alt?: string }[];
+
 }) {
   return (
     <>
@@ -42,6 +48,7 @@ export default function SolutionBlock({
           <div>
             <b>Ответ:</b> {formatAnswer(answer)}
           </div>
+
           {solutionMdx ? (
             <div className="mt-2">
               <b>Решение:</b>
@@ -50,6 +57,7 @@ export default function SolutionBlock({
                 components={{ TaskTable, SimpleSVG, TaskImage }}
                 scope={{ tables, svgs, images }}
               />
+
             </div>
           ) : (
             solution && (

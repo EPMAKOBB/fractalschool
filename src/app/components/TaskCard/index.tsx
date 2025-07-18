@@ -47,6 +47,7 @@ export default function TaskCard(props: TaskCardProps) {
       <Card className="mb-4">
         <CardContent className="space-y-4">
           <TaskHead task={task} subject={subject} />
+
           {task.body_mdx ? (
             <MDX
               code={task.body_mdx}
@@ -56,6 +57,7 @@ export default function TaskCard(props: TaskCardProps) {
           ) : (
             <TaskStatement html={task.body_md} />
           )}
+
           <TaskInput
             answerType={answerType}
             answer={userAnswer}
@@ -71,10 +73,12 @@ export default function TaskCard(props: TaskCardProps) {
             onToggle={() => setShowSolution(s => !s)}
             answer={task.answer_json}
             solution={task.solution_md}
+
             solutionMdx={task.solution_mdx ?? undefined}
             tables={task.tables}
             svgs={task.svgs}
             images={task.images}
+
           />
         </CardContent>
       </Card>
@@ -90,6 +94,7 @@ export default function TaskCard(props: TaskCardProps) {
     >
       <CardContent className="space-y-4">
         <TaskHead task={task} subject={subject} />
+
         {task.body_mdx ? (
           <MDX
             code={task.body_mdx}
@@ -99,6 +104,7 @@ export default function TaskCard(props: TaskCardProps) {
         ) : (
           <TaskStatement html={task.body_md} />
         )}
+
         <TaskInput
           answerType={answerType}
           answer={value}

@@ -1,3 +1,4 @@
+
 // src/app/components/TaskComponents/TaskTable.tsx
 "use client";
 
@@ -27,5 +28,6 @@ export default function TaskTable({
       </tbody>
     </table>
   );
+
 }
 
