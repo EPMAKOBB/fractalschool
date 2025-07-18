@@ -34,3 +34,24 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Task Data Format
+
+Tasks may embed rich content such as tables or SVG diagrams. When a task requires multiple tables or graphics, these elements are stored inside `answer_json` using two optional objects:
+
+- **`tables_data`** – maps arbitrary keys to table descriptions. Each table value is an array of rows, where every row is an array of cells. A cell object can specify:
+  - `text`: cell content
+  - `rowspan` *(optional)*
+  - `colspan` *(optional)*
+  - `align` *("left" | "center" | "right")*
+  - `highlighted` *(boolean)*
+
+- **`svg_data`** – maps keys to SVG descriptions of the form:
+
+  ```ts
+  { width: number; height: number; elements: SvgElement[] }
+  ```
+
+  `SvgElement` types are defined in `src/app/components/TaskComponents/SimpleSVG.tsx`.
+
+These objects allow a single task statement to reference several tables and diagrams by key.

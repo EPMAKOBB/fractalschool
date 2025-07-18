@@ -1,6 +1,12 @@
 // src/app/components/TaskComponents/SimpleSVG.tsx
 import React from "react";
 
+/**
+ * Used by tasks that store multiple SVG diagrams inside `answer_json.svg_data`.
+ * Each entry in `svg_data` should have the shape
+ * `{ width: number; height: number; elements: SvgElement[] }`.
+ */
+
 type Base = { stroke?: string; strokeWidth?: number; fill?: string };
 type Line    = { type: "line";    x1: number; y1: number; x2: number; y2: number } & Base & { strokeDasharray?: string };
 type Circle  = { type: "circle";  cx: number; cy: number; r: number } & Base;
