@@ -8,9 +8,11 @@ export type UserAnswer = string | string[] | string[][];
 
 export type Task = {
   id: string;
+
   body_mdx: string;
   answer_json: any;
   solution_mdx: string | null;
+
   type_num: number | null;
   answer_type?: string;
   maxScore?: number;

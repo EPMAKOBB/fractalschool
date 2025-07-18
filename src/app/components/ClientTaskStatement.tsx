@@ -1,12 +1,12 @@
 // src/app/components/ClientTaskStatement.tsx
 "use client";
 
+import MdxRender from "./MdxRender";
+
 type Props = {
-  html: string;
+  mdx: string;
 };
 
-export default function ClientTaskStatement({ html }: Props) {
-  return (
-    <div className="mb-4" dangerouslySetInnerHTML={{ __html: html }} />
-  );
+export default function ClientTaskStatement({ mdx }: Props) {
+  return <MdxRender source={mdx} />;
 }
