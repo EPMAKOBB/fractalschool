@@ -1,3 +1,4 @@
+
 import type { Table } from './TaskTable';
 
 /** Example tables used by TaskTable tests and documentation. */
@@ -18,3 +19,4 @@ const tables: Record<string, Table> = {
 };
 
 export default tables;
+
