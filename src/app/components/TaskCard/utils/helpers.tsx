@@ -1,6 +1,7 @@
 // src/app/components/TaskCard/utils/helpers.tsx
 
 import React from "react";
+import { formatAnswer } from "@/utils/formatAnswer";
 
 /* ---------- Типы данных ---------- */
 export type UserAnswer = string | string[] | string[][];
@@ -8,8 +9,10 @@ export type UserAnswer = string | string[] | string[][];
 export type Task = {
   id: string;
   body_md: string;
+  body_mdx?: string | null;
   answer_json: any;
   solution_md: string | null;
+  solution_mdx?: string | null;
   type_num: number | null;
   answer_type?: string;
   maxScore?: number;
@@ -58,28 +61,4 @@ export function getInitialAnswer(answerType: string = "single"): UserAnswer {
 }
 
 /* ---------- formatAnswer (для SolutionBlock) ---------- */
-export function formatAnswer(ans: any): string | React.ReactElement {
-  if (Array.isArray(ans)) {
-    // двумерный массив → таблица
-    if (ans.length > 0 && Array.isArray(ans[0])) {
-      return (
-        <table className="border border-gray-500 rounded my-2">
-          <tbody>
-            {ans.map((row: any[], i: number) => (
-              <tr key={i}>
-                {row.map((cell: any, j: number) => (
-                  <td key={j} className="px-2 py-1 border border-gray-400">
-                    {cell}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      );
-    }
-    // одномерный массив
-    return ans.join(", ");
-  }
-  return String(ans);
-}
+export { formatAnswer };

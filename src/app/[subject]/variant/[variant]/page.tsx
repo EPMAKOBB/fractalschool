@@ -1,6 +1,7 @@
 // src/app/[subject]/variant/[variant]/page.tsx
 
 import { createClient } from "@/utils/supabase/server";
+
 import { subjectsMeta } from "../../../config/subjectsMeta";
 import React, { Suspense } from "react";
 import TaskCard from "../../../components/TaskCard";
@@ -39,6 +40,7 @@ function VariantTaskList({ tasks, subject }: { tasks: Task[]; subject: string })
     </div>
   );
 }
+
 
 
 type Props = {

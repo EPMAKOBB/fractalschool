@@ -10,7 +10,7 @@ import type {
   VariantModeProps,
 } from "./utils/helpers";
 import { getInitialAnswer } from "./utils/helpers";
-import { checkAnswer } from "./utils/checkAnswer";
+import { checkAnswer } from "@/utils/checkAnswer";
 import TaskHead from "./TaskHead";
 import TaskStatement from "./TaskStatement";
 import TaskInput from "./TaskInput";
@@ -43,7 +43,7 @@ export default function TaskCard(props: TaskCardProps) {
       <Card className="mb-4">
         <CardContent className="space-y-4">
           <TaskHead task={task} subject={subject} />
-          <TaskStatement html={task.body_md} />
+          <TaskStatement mdx={task.body_mdx ?? task.body_md} />
           <TaskInput
             answerType={answerType}
             answer={userAnswer}
@@ -59,6 +59,7 @@ export default function TaskCard(props: TaskCardProps) {
             onToggle={() => setShowSolution(s => !s)}
             answer={task.answer_json}
             solution={task.solution_md}
+            solutionMdx={task.solution_mdx}
           />
         </CardContent>
       </Card>
@@ -74,7 +75,7 @@ export default function TaskCard(props: TaskCardProps) {
     >
       <CardContent className="space-y-4">
         <TaskHead task={task} subject={subject} />
-        <TaskStatement html={task.body_md} />
+        <TaskStatement mdx={task.body_mdx ?? task.body_md} />
         <TaskInput
           answerType={answerType}
           answer={value}
