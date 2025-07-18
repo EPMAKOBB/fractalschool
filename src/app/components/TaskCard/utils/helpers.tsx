@@ -8,6 +8,7 @@ export type UserAnswer = string | string[] | string[][];
 
 export type Task = {
   id: string;
+
   body_md: string;
 
   /** MDX-представление условия */
@@ -17,6 +18,7 @@ export type Task = {
   /** MDX-представление решения */
 
   solution_mdx?: string | null;
+
   type_num: number | null;
   answer_type?: string;
   maxScore?: number;
@@ -24,6 +26,7 @@ export type Task = {
   task_num_text?: string | null;
   notes_text?: string | null;
   source?: string | null;
+
   /** Наборы данных для компонентов в MDX */
   tables?: (string | number)[][][];
   svgs?: {
@@ -32,6 +35,7 @@ export type Task = {
     elements: import("../../TaskComponents/SimpleSVG").SvgElement[];
   }[];
   images?: { src: string; alt?: string }[];
+
   // ... если будут ещё новые поля — добавь их сюда
 };
 
