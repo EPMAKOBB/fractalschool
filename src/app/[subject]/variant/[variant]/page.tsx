@@ -28,11 +28,11 @@ function VariantTaskList({ tasks, subject }: { tasks: Task[]; subject: string })
             answer_type: task.answer_type ?? "single",
             maxScore: task.maxScore ?? 1,
           }}
-          mode="variant"
-          value={answers[idx]}
+         
+          
           onChange={val => {
             const next = [...answers];
-            next[idx] = val;
+            
             setAnswers(next);
           }}
         />

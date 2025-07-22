@@ -1,74 +1,30 @@
 // src/app/components/TaskCard/SolutionBlock.tsx
-import { formatAnswer } from "./utils/helpers";
 
-import MDX from "../TaskComponents/MDX";
-import TaskTable from "../TaskComponents/TaskTable";
-import { SimpleSVG } from "../TaskComponents/SimpleSVG";
-import TaskImage from "../TaskComponents/TaskImage";
+import React from "react";
+import ReactMarkdown from "react-markdown";
 
+export interface SolutionBlockProps {
+  show: boolean;              // Показывать ли решение
+  solution_md: string;        // Текст решения (обычно markdown)
+  notes_text?: string | null; // Доп. примечания (если есть)
+}
 
 export default function SolutionBlock({
-  open,
-  onToggle,
-  answer,
-  solution,
-  solutionMdx,
+  show,
+  solution_md,
+  notes_text,
+}: SolutionBlockProps) {
+  if (!show) return null;
 
-  tables,
-  svgs,
-  images,
-
-}: {
-  open: boolean;
-  onToggle: () => void;
-  answer: any;
-
-  solution?: string | null;
-  solutionMdx?: string | null;
-  tables?: (string | number)[][][];
-  svgs?: {
-    width: number;
-    height: number;
-    elements: import("../TaskComponents/SimpleSVG").SvgElement[];
-  }[];
-  images?: { src: string; alt?: string }[];
-
-}) {
   return (
-    <>
-      <button
-        className="text-blue-400 underline text-sm"
-        onClick={onToggle}
-      >
-        {open ? "Скрыть решение и ответ" : "Показать решение и ответ"}
-      </button>
-
-      {open && (
-        <div className="mt-3 bg-gray-900 rounded p-3 text-sm">
-          <div>
-            <b>Ответ:</b> {formatAnswer(answer)}
-          </div>
-
-          {solutionMdx ? (
-            <div className="mt-2">
-              <b>Решение:</b>
-              <MDX
-                code={solutionMdx}
-                components={{ TaskTable, SimpleSVG, TaskImage }}
-                scope={{ tables, svgs, images }}
-              />
-
-            </div>
-          ) : (
-            solution && (
-              <div className="mt-2">
-                <b>Решение:</b>
-                <div className="whitespace-pre-line">{solution}</div>
-              </div>
-            )
-          )}
-        </div>
+    <div className="mt-4 p-4 border rounded bg-[hsl(var(--secondary))]">
+      <div className="font-bold mb-2">Решение</div>
+      <div className="prose max-w-none">
+        <ReactMarkdown>{solution_md}</ReactMarkdown>
+      </div>
+      {notes_text && (
+        <div className="mt-2 text-xs text-muted-foreground italic">{notes_text}</div>
       )}
-    </>
+    </div>
   );
 }

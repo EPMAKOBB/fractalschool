@@ -1,123 +1,74 @@
 // src/app/components/TaskCard/index.tsx
 
 "use client";
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import type {
-  Task,
-  UserAnswer,
-  TaskCardProps,
-  VariantModeProps,
-} from "./utils/helpers";
-import { getInitialAnswer } from "./utils/helpers";
-import { checkAnswer } from "@/utils/checkAnswer";
-import TaskHead from "./TaskHead";
+
 import TaskStatement from "./TaskStatement";
 import TaskInput from "./TaskInput";
-import SingleControls from "./SingleControls";
 import SolutionBlock from "./SolutionBlock";
-import MDX from "../TaskComponents/MDX";
-import TaskTable from "../TaskComponents/TaskTable";
-import { SimpleSVG } from "../TaskComponents/SimpleSVG";
-import TaskImage from "../TaskComponents/TaskImage";
 
-/** Карточка-обёртка: выбирает режим single / variant. */
-export default function TaskCard(props: TaskCardProps) {
-  const { task, subject } = props;
-  const answerType = task.answer_type ?? "single";
+import { useState } from "react";
 
-  // SINGLE MODE
-  if (props.mode === "single") {
-    const { maxScore = 1 } = task;
-    const [userAnswer, setUserAnswer] = useState<UserAnswer>(getInitialAnswer(answerType));
-    const [score, setScore] = useState<number | null>(null);
-    const [showSolution, setShowSolution] = useState(false);
+// разбор task на составляющие
+export interface Task {
 
-    const handleCheck = () => {
-      const { score } = checkAnswer({
-        answerType,
-        correctAnswer: task.answer_json,
-        userAnswer,
-        maxScore,
-      });
-      setScore(score);
-    };
+  id: string | number; // id задачи в базе
+  type_num: number;  // номер типа 
+  subtype_text: string;  // подтип
+  task_num_text: string;  // slug-номер для фронтенда
+  source: string;  // источник задачи
+  difficulty: number;  //  сложность
 
-    return (
-      <Card className="mb-4">
-        <CardContent className="space-y-4">
-          <TaskHead task={task} subject={subject} />
+  body_md: string;  // тело условия
 
+  answer_json: number | string | [number, number] | number[] | [number, number][] | null; // правильный ответ
+  solution_md: string;  //  тело решения
+  notes_text: string | null;   //  примечания
+}
 
-          {task.body_mdx ? (
-            <MDX
-              code={task.body_mdx}
-              components={{ TaskTable, SimpleSVG, TaskImage }}
-              scope={{ tables: task.tables, svgs: task.svgs, images: task.images }}
-            />
-          ) : (
-            <TaskStatement html={task.body_md} />
-          )}
+interface TaskCardProps {
+  task: Task;
+  subject: string;
+}
 
-
-          <TaskInput
-            answerType={answerType}
-            answer={userAnswer}
-            onChange={setUserAnswer}
-          />
-          <SingleControls
-            onCheck={handleCheck}
-            score={score}
-            maxScore={maxScore}
-          />
-          <SolutionBlock
-            open={showSolution}
-            onToggle={() => setShowSolution(s => !s)}
-            answer={task.answer_json}
-
-            solution={task.solution_md}
-
-            solutionMdx={task.solution_mdx ?? undefined}
-            tables={task.tables}
-            svgs={task.svgs}
-            images={task.images}
-
-
-          />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // VARIANT MODE
-  const { value, onChange, disabled } = props as VariantModeProps;
+export default function TaskCard({ task, subject }: TaskCardProps) {
+  const [userAnswer, setUserAnswer] = useState("");
+  const [showSolution, setShowSolution] = useState(false);
 
   return (
-    <Card
-      className={`mb-4 ${disabled ? "opacity-60 pointer-events-none" : ""}`}
-    >
-      <CardContent className="space-y-4">
-        <TaskHead task={task} subject={subject} />
+    <div className="border rounded-xl p-4 shadow bg-[hsl(var(--card))]">
 
+       <div className="mb-2 text-xs text-gray-400 border p-2 rounded bg-black/30">
+      <b>DEBUG:</b>
+      <pre>{JSON.stringify(task.source, null, 2)}</pre>
+      <div>userAnswer: <b>{JSON.stringify(userAnswer)}</b></div>
+      <div>showSolution: <b>{String(showSolution)}</b></div>
+      <div>subject: <b>{subject}</b></div>
+    </div>
 
-        {task.body_mdx ? (
-          <MDX
-            code={task.body_mdx}
-            components={{ TaskTable, SimpleSVG, TaskImage }}
-            scope={{ tables: task.tables, svgs: task.svgs, images: task.images }}
-          />
-        ) : (
-          <TaskStatement html={task.body_md} />
-        )}
+      <TaskStatement {...{
+        type_num: task.type_num,
+        subtype_text: task.subtype_text,
+        task_num_text: task.task_num_text,
+        source: task.source,
+        difficulty: task.difficulty,
+        body_md: task.body_md,
+      }} />
 
+      <TaskInput
+        type_num={task.type_num}
+        subject={subject}
+        answer_json={task.answer_json}
+        value={userAnswer}
+        onChange={setUserAnswer}
+        showSolution={showSolution}
+        setShowSolution={setShowSolution}
+      />
 
-        <TaskInput
-          answerType={answerType}
-          answer={value}
-          onChange={onChange}
-          disabled={disabled}
-        />
-      </CardContent>
-    </Card>
+     <SolutionBlock
+  show={showSolution}
+  solution_md={task.solution_md}
+  notes_text={task.notes_text}
+/>
+    </div>
   );
 }

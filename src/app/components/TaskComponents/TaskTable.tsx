@@ -1,96 +1,127 @@
-
-
 // src/app/components/TaskComponents/TaskTable.tsx
-"use client";
-
 
 import React from "react";
-import tables_data from "./tables_data";
+import clsx from "clsx";
 
-// Тип ячейки таблицы. Если нужно объединение ячеек,
-// передай объект { content, rowSpan?, colSpan? }
-export type TableCell =
-  | React.ReactNode
+type TableCell =
+  | string
+  | number
   | {
-      content: React.ReactNode;
-      rowSpan?: number;
-      colSpan?: number;
+      value: React.ReactNode;
+      colspan?: number;
+      rowspan?: number;
+      width?: number | string;
+      height?: number | string;
+      className?: string;
+      style?: React.CSSProperties;
+      bg?: string; // <--- добавили поддержку bg
     };
 
-export type TableRow = TableCell[];
-export type Table = TableRow[];
-
-export type TaskTableProps = {
-  /** Ключ внутри tables_data (если там объект таблиц) */
-  dataKey?: string;
-  /** Заголовок(и) таблицы */
-  head?: TableRow | TableRow[];
-  /** Подпись таблицы */
-  caption?: string | string[];
-  /** CSS-класс обёртки */
+interface TaskTableProps {
+  table: {
+    header?: TableCell[];
+    subheader?: TableCell[];
+    rows: TableCell[][];
+  };
+  caption?: string;
   className?: string;
-};
+}
 
-/**
- * Универсальный компонент рендера таблицы.
- * Данные берутся из tables_data, а meta-инфо передаётся через props.
- */
-export default function TaskTable({
-  dataKey,
-  head,
-  caption,
-  className,
-}: TaskTableProps) {
-  let data: any = tables_data;
-  if (dataKey && data && typeof data === "object") {
-    data = data[dataKey];
+// Функция для формирования итогового класса ячейки
+function getCellClass(cell: any) {
+  let classes = cell.className ?? "";
+  if (cell.bg) {
+    classes += ` ${cell.bg}`; // просто добавляем Tailwind класс заливки
   }
-  if (!data) return null;
+  return classes;
+}
 
-  const tables: Table[] = Array.isArray(data) && Array.isArray(data[0])
-    ? [data as Table]
-    : Object.values(data as Record<string, Table>);
-
-  const headRows: TableRow[] = !head
-    ? []
-    : Array.isArray(head[0])
-    ? (head as TableRow[])
-    : [head as TableRow];
-
-  const captions: (string | undefined)[] = Array.isArray(caption)
-    ? caption
-    : tables.map(() => caption);
-
-  const renderCell = (cell: TableCell, key: number) => {
-    if (
-      cell &&
-      typeof cell === "object" &&
-      !React.isValidElement(cell) &&
-      "content" in cell
-    ) {
-      const { content, rowSpan, colSpan } = cell as any;
+export default function TaskTable({ table, caption, className }: TaskTableProps) {
+  // Рендер ячейки (универсально)
+  const renderCell = (
+    cell: TableCell,
+    i: number,
+    tag: "td" | "th" = "td",
+    forceRotate?: boolean
+  ) => {
+    if (typeof cell === "object" && cell !== null) {
+      const {
+        value,
+        colspan,
+        rowspan,
+        width,
+        height,
+        style,
+      } = cell;
+      const Tag = tag;
+      // Добавим поворот текста для subheader
+      const rotateStyle = forceRotate
+        ? {
+            writingMode: "vertical-lr" as const,
+            transform: "rotate(180deg)",
+            ...style,
+          }
+        : style;
       return (
-        <td
-          key={key}
-          rowSpan={rowSpan}
-          colSpan={colSpan}
-          className="border border-gray-400 px-2 py-1 text-center"
+        <Tag
+          key={i}
+          colSpan={colspan}
+          rowSpan={rowspan}
+          width={width}
+          height={height}
+          className={clsx("border px-2 py-1 text-center", getCellClass(cell))}
+          style={rotateStyle}
         >
-          {content}
-        </td>
+          {value}
+        </Tag>
       );
     }
+    const Tag = tag;
     return (
-      <td key={key} className="border border-gray-400 px-2 py-1 text-center">
-        {cell as any}
-      </td>
+      <Tag
+        key={i}
+        className={clsx(
+          "border px-2 py-1 text-center",
+          forceRotate && "rotate-180 writing-mode-vertical-lr"
+        )}
+        style={
+          forceRotate
+            ? { writingMode: "vertical-lr", transform: "rotate(180deg)" }
+            : undefined
+        }
+      >
+        {cell}
+      </Tag>
     );
   };
 
-
-
+  if (!table || !Array.isArray(table.rows)) {
+    return <div className="text-red-500">Нет данных для таблицы</div>;
+  }
+  return (
+    <table className={className ?? "border-collapse border w-full my-2"}>
+      {caption && (
+        <caption className="text-xs text-muted-foreground pb-1">{caption}</caption>
+      )}
+      {table.header && (
+        <thead>
+          <tr>
+            {table.header.map((cell, i) => renderCell(cell, i, "th"))}
+          </tr>
+          {table.subheader && (
+            <tr>
+              {table.subheader.map((cell, i) => renderCell(cell, i, "th", true))}
+            </tr>
+          )}
+        </thead>
+      )}
+      <tbody>
+        {table.rows.map((row, i) => (
+          <tr key={i}>
+            {row.map((cell, j) => renderCell(cell, j, "td"))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
-
-
 }
-

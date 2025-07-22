@@ -1,33 +1,27 @@
-// src/app/components/TaskComponents/MDX.tsx
-"use client";
+// // src/app/components/TaskComponents/MDX.tsx
 
-import React, { useMemo } from "react";
-import { MDXProvider } from "@mdx-js/react";
-import type { MDXComponents } from "mdx/types";
-import * as runtime from "react/jsx-runtime";
+// import * as React from "react";
+// import { MDXProvider } from "@mdx-js/react";
+// import { useMemo } from "react";
 
-export default function MDX({
-  code,
-  components,
-  scope = {},
-}: {
-  code: string;
-  components?: MDXComponents;
-  scope?: Record<string, any>;
-}) {
-  const Component = useMemo(() => {
-    try {
-      const argNames = ["React", "_runtime", ...Object.keys(scope)];
-      const argValues = [React, runtime, ...Object.values(scope)];
-      const fn = new Function(...argNames, `${code}; return MDXContent;`);
-      return fn(...argValues);
-    } catch (e) {
-      console.error("Failed to compile MDX", e);
-      return () => <pre className="text-red-400">MDX error</pre>;
-    }
-  }, [code, scope]);
+// // Нужно будет установить пакет: npm install @mdx-js/react @mdx-js/runtime
 
-  return (
-    <MDXProvider components={components}>{React.createElement(Component)}</MDXProvider>
-  );
-}
+// import { MDXRuntime } from "@mdx-js/runtime";
+
+// interface MDXProps {
+//   code: string; // MDX-текст задачи или решения
+//   components?: Record<string, React.ComponentType<any>>; // Встраиваемые компоненты
+//   scope?: Record<string, any>; // Данные, доступные внутри MDX
+// }
+
+// export default function MDX({ code, components = {}, scope = {} }: MDXProps) {
+//   // Используем @mdx-js/runtime для динамического рендеринга
+//   // (если нужен только статический импорт — можно использовать next-mdx-remote, но этот способ проще и гибче)
+//   return (
+//     <MDXProvider components={components}>
+//       <MDXRuntime components={components} scope={scope}>
+//         {code}
+//       </MDXRuntime>
+//     </MDXProvider>
+//   );
+// }

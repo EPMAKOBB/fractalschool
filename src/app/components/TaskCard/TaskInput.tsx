@@ -1,80 +1,101 @@
 // src/app/components/TaskCard/TaskInput.tsx
-import type { UserAnswer } from "./utils/helpers";
-import { Input } from "@/components/ui/input";
 
-/** Свитчер всех форм ввода по answerType. */
-export default function TaskInput({
-  answerType,
-  answer,
-  onChange,
-  disabled,
-}: {
-  answerType: string;
-  answer: UserAnswer;
-  onChange: (a: UserAnswer) => void;
-  disabled?: boolean;
-}) {
-  switch (answerType) {
-    case "pair":
-    case "pair_partial":
-      return (
-        <div className="flex gap-2">
-          {[0, 1].map(idx => (
-            <Input
-              key={idx}
-              className="flex-1"
-              value={(answer as string[])[idx] ?? ""}
-              onChange={e => {
-                const next = [...(answer as string[])];
-                next[idx] = e.target.value;
-                onChange(next);
-              }}
-              disabled={disabled}
-            />
-          ))}
-        </div>
-      );
+"use client";
 
-    case "table_2x2":
-    case "table_10x2": {
-      const rows = answerType === "table_2x2" ? 2 : 10;
-      return (
-        <table className="border border-gray-500 rounded mb-2">
-          <tbody>
-            {Array.from({ length: rows }).map((_, r) => (
-              <tr key={r}>
-                {[0, 1].map(c => (
-                  <td key={c} className="p-1">
-                    <Input
-                      className="w-16"
-                      value={(answer as string[][])[r]?.[c] ?? ""}
-                      onChange={e => {
-                        const next = (answer as string[][]).map(row => [
-                          ...row,
-                        ]);
-                        next[r][c] = e.target.value;
-                        onChange(next);
-                      }}
-                      disabled={disabled}
-                    />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      );
+import { useState } from "react";
+import AnswerFields from "@/app/components/AnswerFields";
+import { Button } from "@/components/ui/button";
+import { checkAnswer } from "@/utils/checkAnswer"; 
+import type { AnswerType } from "@/utils/checkAnswer";
+
+export interface TaskInputProps {
+  type_num: number;
+  subject: string;
+  answer_json: any;
+  value: any;
+  onChange: (val: any) => void;
+  showSolution: boolean;
+  setShowSolution: (v: boolean) => void;
+}
+
+export default function TaskInput(props: TaskInputProps) {
+  const { type_num, subject, answer_json, value, onChange, showSolution, setShowSolution } = props;
+
+  // Состояние для результата проверки
+  const [result, setResult] = useState<{ status: string; score: number } | null>(null);
+
+  // Определяем тип ответа и максимальный балл
+  let answerType: AnswerType = "single";
+  let maxScore = 1;
+
+  if (subject === "inf-ege") {
+    switch (type_num) {
+      case 17:
+      case 18:
+      case 20:
+        answerType = "pair";
+        maxScore = 2;
+        break;
+      case 25:
+        answerType = "table_10x2";
+        maxScore = 4;
+        break;
+      case 26:
+        answerType = "pair_partial";
+        maxScore = 2;
+        break;
+      case 27:
+        answerType = "table_2x2";
+        maxScore = 2;
+        break;
+      default:
+        answerType = "single";
+        maxScore = 1;
     }
-
-    default:
-      return (
-        <Input
-          className="w-full"
-          value={(answer as string) ?? ""}
-          onChange={e => onChange(e.target.value)}
-          placeholder="Ваш ответ"
-          disabled={disabled}
-        />
-      );
   }
+
+  // Обработчик проверки ответа
+  const handleCheck = () => {
+    const check = checkAnswer({
+      answerType,
+      userAnswer: value,
+      correctAnswer: answer_json,
+      maxScore
+    });
+    setResult(check);
+    setShowSolution(true);
+  };
+
+  return (
+    <div>
+      <AnswerFields
+        answerType={answerType}
+        value={value}
+        onChange={onChange}
+        disabled={showSolution}
+      />
+
+      <Button
+        className="mt-2"
+        onClick={handleCheck}
+        disabled={showSolution}
+      >
+        Проверить
+      </Button>
+
+      {result && (
+        <div className="mt-2 text-sm">
+          {result.status === "correct" && (
+            <span className="text-green-600">Верно! Баллов: {result.score}</span>
+          )}
+          {result.status === "partial" && (
+            <span className="text-yellow-600">Частично верно, баллов: {result.score}</span>
+          )}
+          {result.status === "wrong" && (
+            <span className="text-red-500">Неверно. Баллов: 0</span>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
