@@ -3,11 +3,11 @@
 import { createClient } from "@/utils/supabase/server";
 import TaskCard from "@/app/components/TaskCard";
 
-type Props = {
+type PageProps = {
   params: { subject: string; task: string };
 };
 
-export default async function TaskPage({ params }: Props) {
+export default async function Page({ params }: PageProps) {
   const supabase = await createClient();
   const { subject, task } = params;
 

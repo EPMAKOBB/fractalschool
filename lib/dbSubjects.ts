@@ -1,6 +1,6 @@
 // lib/dbSubjects.ts
 import { createClient } from "@/utils/supabase/server";
-import type { Database } from "@/types/db";
+import type { Database } from "@/types/databases.ts";
 
 const cache = new Map<string, Database["public"]["Tables"]["subjects"]["Row"]>();
 

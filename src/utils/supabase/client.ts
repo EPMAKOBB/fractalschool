@@ -1,6 +1,6 @@
 // src/utils/supabase/client.ts
 import { createBrowserClient } from "@supabase/ssr";
-import { Database } from "@/types/db";
+import { Database } from "@/types/databases";
 
 export const supabase = createBrowserClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
