@@ -35,17 +35,12 @@ export default function TaskCard({ task, subject }: TaskCardProps) {
   const [showSolution, setShowSolution] = useState(false);
 
   return (
-    <div className="border rounded-xl p-4 shadow bg-[hsl(var(--card))]">
+    <div className="border  p-4 shadow ">
 
-       <div className="mb-2 text-xs text-gray-400 border p-2 rounded bg-black/30">
-      <b>DEBUG:</b>
-      <pre>{JSON.stringify(task.source, null, 2)}</pre>
-      <div>userAnswer: <b>{JSON.stringify(userAnswer)}</b></div>
-      <div>showSolution: <b>{String(showSolution)}</b></div>
-      <div>subject: <b>{subject}</b></div>
-    </div>
+   
 
       <TaskStatement {...{
+        subject, 
         type_num: task.type_num,
         subtype_text: task.subtype_text,
         task_num_text: task.task_num_text,
@@ -60,12 +55,25 @@ export default function TaskCard({ task, subject }: TaskCardProps) {
         answer_json={task.answer_json}
         value={userAnswer}
         onChange={setUserAnswer}
-        showSolution={showSolution}
-        setShowSolution={setShowSolution}
       />
 
-     <SolutionBlock
+     <div className="mt-4 text-sm text-right">
+  <span
+    className="text-blue-600 cursor-pointer border-b border-dashed border-blue-400 hover:border-b-2 transition"
+    onClick={() => setShowSolution(v => !v)}
+    tabIndex={0} // позволяет фокусироваться с клавиатуры
+    role="button" // для доступности
+    onKeyDown={e => {
+      if (e.key === "Enter" || e.key === " ") setShowSolution(v => !v);
+    }}
+  >
+    {showSolution ? "Свернуть ответ и решение" : "Показать ответ и решение"}
+  </span>
+</div>
+
+<SolutionBlock
   show={showSolution}
+  answer_json={task.answer_json}
   solution_md={task.solution_md}
   notes_text={task.notes_text}
 />

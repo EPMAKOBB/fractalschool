@@ -1,60 +1,43 @@
 // src/app/[subject]/task/[task]/page.tsx
 
 import { createClient } from "@/utils/supabase/server";
-import { subjectsMeta } from "@/app/config/subjectsMeta";
 import TaskCard from "@/app/components/TaskCard";
 
 type Props = {
-  params: Promise<{ subject: string; task: string }>;
+  params: { subject: string; task: string };
 };
 
-export default async function TaskPage(props: Props) {
-  /* ---------- Маршрут ---------- */
+export default async function TaskPage({ params }: Props) {
   const supabase = await createClient();
-  const { subject, task } = await props.params; // task — uuid-строка
+  const { subject, task } = params;
 
-  /* ---------- Предмет ---------- */
-  const { data: subj, error: subjErr } = await supabase
+  // 1. Найти id предмета
+  const { data: subjRow, error: subjErr } = await supabase
     .from("subjects")
-    .select("*")
+    .select("id")
     .eq("slug", subject)
     .single();
 
-  if (subjErr || !subj)
-    return (
-      <div className="p-8 text-red-400">
-        Неизвестный предмет: {subject}
-      </div>
-    );
+  if (subjErr || !subjRow) {
+    return <div className="p-8 text-red-400">Неизвестный предмет</div>;
+  }
 
-  const uiMeta = subjectsMeta.find(s => s.slug === subject);
-
-  /* ---------- Задача ---------- */
+  // 2. Найти задачу по subject_id и task_num_text (slug-номер)
   const { data: taskRow, error: taskErr } = await supabase
     .from("tasks_static")
     .select("*")
-    .eq("subject_id", subj.id)
-    .eq("id", task)            // id — primary key UUID
+    .eq("subject_id", subjRow.id)
+    .eq("task_num_text", task)
     .single();
 
-  if (taskErr)
-    return (
-      <div className="p-8 text-red-400">
-        Ошибка загрузки задачи: {taskErr.message}
-      </div>
-    );
+  if (taskErr || !taskRow) {
+    return <div className="p-8 text-red-400">Задача не найдена</div>;
+  }
 
-  if (!taskRow)
-    return <div className="p-8 text-gray-400">Задача не найдена</div>;
-
-  /* ---------- UI ---------- */
+  // 3. Отрисовать TaskCard
   return (
-    <main className="max-w-3xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">
-        {uiMeta?.label ?? subj.title}: задача №{taskRow.type_num ?? "?"}
-      </h1>
-
-      <TaskCard task={taskRow} subject={subject} mode="single" />
+    <main className="max-w-2xl mx-auto py-8">
+      <TaskCard task={taskRow} subject={subject} />
     </main>
   );
 }

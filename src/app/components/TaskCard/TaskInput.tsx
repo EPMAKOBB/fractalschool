@@ -5,7 +5,7 @@
 import { useState } from "react";
 import AnswerFields from "@/app/components/AnswerFields";
 import { Button } from "@/components/ui/button";
-import { checkAnswer } from "@/utils/checkAnswer"; 
+import { checkAnswer } from "@/utils/checkAnswer";
 import type { AnswerType } from "@/utils/checkAnswer";
 
 export interface TaskInputProps {
@@ -14,14 +14,12 @@ export interface TaskInputProps {
   answer_json: any;
   value: any;
   onChange: (val: any) => void;
-  showSolution: boolean;
-  setShowSolution: (v: boolean) => void;
+  disabled?: boolean; // теперь управление блокировкой только этим пропсом
 }
 
 export default function TaskInput(props: TaskInputProps) {
-  const { type_num, subject, answer_json, value, onChange, showSolution, setShowSolution } = props;
+  const { type_num, subject, answer_json, value, onChange } = props;
 
-  // Состояние для результата проверки
   const [result, setResult] = useState<{ status: string; score: number } | null>(null);
 
   // Определяем тип ответа и максимальный балл
@@ -63,7 +61,6 @@ export default function TaskInput(props: TaskInputProps) {
       maxScore
     });
     setResult(check);
-    setShowSolution(true);
   };
 
   return (
@@ -72,13 +69,13 @@ export default function TaskInput(props: TaskInputProps) {
         answerType={answerType}
         value={value}
         onChange={onChange}
-        disabled={showSolution}
+        // disabled убран!
       />
 
       <Button
-        className="mt-2"
+        className="mt-2 cursor-pointer"
         onClick={handleCheck}
-        disabled={showSolution}
+        // disabled убран!
       >
         Проверить
       </Button>

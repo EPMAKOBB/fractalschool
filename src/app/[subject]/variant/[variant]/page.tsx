@@ -1,137 +1,89 @@
 // src/app/[subject]/variant/[variant]/page.tsx
 
 import { createClient } from "@/utils/supabase/server";
+import { subjectsMeta } from "@/app/config/subjectsMeta";
+import VariantCard from "@/app/components/VariantCard";
 
-import { subjectsMeta } from "../../../config/subjectsMeta";
-import React, { Suspense } from "react";
-import TaskCard from "../../../components/TaskCard";
-import type {
-  Task,
-  UserAnswer,
-} from "../../../components/TaskCard/utils/helpers";
-import { getInitialAnswer } from "../../../components/TaskCard/utils/helpers";
-
-function VariantTaskList({ tasks, subject }: { tasks: Task[]; subject: string }) {
-  "use client";
-  const [answers, setAnswers] = React.useState<UserAnswer[]>(
-    tasks.map(t => getInitialAnswer(t.answer_type ?? "single"))
-  );
-
-  return (
-    <div className="flex flex-col gap-6">
-      {tasks.map((task, idx) => (
-        <TaskCard
-          key={task.id}
-          subject={subject}
-          task={{
-            ...task,
-            answer_type: task.answer_type ?? "single",
-            maxScore: task.maxScore ?? 1,
-          }}
-         
-          
-          onChange={val => {
-            const next = [...answers];
-            
-            setAnswers(next);
-          }}
-        />
-      ))}
-    </div>
-  );
+export interface Task {
+  id: string | number;
+  type_num: number;
+  subtype_text: string;
+  task_num_text: string;
+  source: string;
+  difficulty: number;
+  body_md: string;
+  answer_json: any;
+  solution_md: string;
+  notes_text: string | null;
 }
-
-
 
 type Props = {
   params: Promise<{ subject: string; variant: string }>;
 };
 
-export default async function VariantPage(props: Props) {
+export default async function VariantPage({ params }: Props) {
   const supabase = await createClient();
-  /* ---------- параметры маршрута ---------- */
-  const { subject, variant } = await props.params;
 
-  /* ---------- предмет ---------- */
-  const { data: subj, error: subjErr } = await supabase
+  // Ждём params (если это промис)
+  const { subject, variant } = await params;
+
+  // Получаем сам subject
+  const { data: subjRow, error: subjErr } = await supabase
     .from("subjects")
     .select("*")
     .eq("slug", subject)
     .single();
 
-  if (subjErr || !subj) {
-    return (
-      <div className="p-8 text-red-400">
-        Неизвестный предмет: {subject}
-      </div>
-    );
+  if (subjErr || !subjRow) {
+    return <div className="p-8 text-red-400">Неизвестный предмет: {subject}</div>;
   }
+
+  // Получаем задачи из variant_task_map + tasks_static (join!)
+  // Сначала получаем id задач этого варианта, затем сами задачи
+  const { data: mappings, error: mapErr } = await supabase
+    .from("variant_task_map")
+    .select("task_id, position")
+    .eq("variant_id", variant)
+    .order("position", { ascending: true });
+
+  if (mapErr || !mappings || mappings.length === 0) {
+    return <div className="p-8 text-gray-400">Нет задач в этом варианте</div>;
+  }
+
+  // Собираем массив id задач
+  const taskIds = mappings.map(m => m.task_id);
+
+  // Получаем все задачи по этим id (сразу все опубликованные)
+  const { data: tasks, error: tasksErr } = await supabase
+    .from("tasks_static")
+    .select("*")
+    .in("id", taskIds)
+    //.eq("status", "published");
+
+  if (tasksErr || !tasks || tasks.length === 0) {
+    return <div className="p-8 text-gray-400">Задачи варианта не найдены</div>;
+  }
+
+  // Опционально — сортируем задачи по position
+  const tasksOrdered = mappings
+    .map(m => tasks.find(t => t.id === m.task_id))
+    .filter(Boolean);
+
+  // Можно найти метаданные варианта, если нужно (title, year и т.д.)
 
   const uiMeta = subjectsMeta.find(s => s.slug === subject);
 
-  /* ---------- вариант ---------- */
-  const { data: variantRow, error: varErr } = await supabase
-    .from("variants")
-    .select("*")
-    .eq("subject_id", subj.id)
-    .eq("slug", variant)
-    .single();
-
-  if (varErr) {
-    return (
-      <div className="p-8 text-red-400">
-        Ошибка загрузки варианта: {varErr.message}
-      </div>
-    );
-  }
-
-  if (!variantRow) {
-    return <div className="p-8 text-gray-400">Вариант не найден</div>;
-  }
-
-  /* ---------- задачи через variant_task_map ---------- */
-  const { data: taskMapRows, error: mapErr } = await supabase
-    .from("variant_task_map")
-    .select(
-      `
-        position,
-        tasks_static:task_id ( * )
-      `
-    )
-    .eq("variant_id", variantRow.id)
-    .order("position");               // сохраняем порядок, заданный в бланке
-
-  if (mapErr) {
-    return (
-      <div className="p-8 text-red-400">
-        Ошибка загрузки задач варианта: {mapErr.message}
-      </div>
-    );
-  }
-
-  if (!taskMapRows || taskMapRows.length === 0) {
-    return (
-      <div className="p-8 text-gray-400">
-        Нет задач в этом варианте
-      </div>
-    );
-  }
-
-  const orderedTasks = taskMapRows
-    .map(r => (r as any).tasks_static)   // вытаскиваем вложенный объект
-    .filter(Boolean);
-
-  /* ---------- UI ---------- */
+  // Передаём в VariantCard все задачи, subject и опционально meta
   return (
     <main className="max-w-3xl mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6">
-        {uiMeta?.label ?? subj.title}: вариант&nbsp;
-        {variantRow.title ?? variantRow.slug}
+        {uiMeta?.label ?? subjRow.title}: вариант {variant}
       </h1>
-
-      <Suspense fallback={<div>Загрузка задач…</div>}>
-        <VariantTaskList tasks={orderedTasks} subject={subject} />
-      </Suspense>
+      <VariantCard
+        tasks={tasksOrdered}
+        subject={subject}
+        // можно пробросить метаданные варианта при желании
+      />
     </main>
   );
 }

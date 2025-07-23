@@ -54,7 +54,7 @@ export default async function TypeTasksPage({ params }: Props) {
       </h1>
       <div className="flex flex-col gap-6">
         {tasks.map(task => (
-          <div key={task.id} className="border p-2">
+          <div key={task.id} >
             <pre className="text-xs text-gray-400">
               
             </pre>

@@ -8,7 +8,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 
 // Сам HTML-код таблицы — вставляем как строку (можно хранить в БД)
-const demoText = `
+const demoText1 = `
 # Пример задачи с таблицей
 
 Ниже приведена таблица расстояний между пунктами:
@@ -107,6 +107,133 @@ const demoText = `
   </div>
 </div>
 `;
+
+const demoText2 = `
+
+На рисунке схема дорог N-ского района изображена в виде графа, в таблице содержатся сведения о протяжённости каждой из этих дорог (в километрах).
+<br />
+<br />
+<div className="flex flex-col md:flex-row gap-6 items-start justify-center w-full">
+  <div>
+  <style className="bg-white dark:bg-black rounded-xl shadow p-3 flex-shrink-0">
+    table, td, th { border: 1px solid #444; border-collapse: collapse; }
+      td, th { padding: 6px; text-align: center; }
+      .bg-[hsl(var(--secondary))] { background: #eee; }
+    td, th {
+      padding: 6px;
+      text-align: center;
+    }
+    /* Пример заливки secondary, если переменная не определена */
+    .bg-\[hsl\(var\(--secondary\)\)\] {
+      background: #eee;
+    }
+  </style>
+
+  <!-- таблица расстояний -->
+  <table >
+    <tbody>
+      <tr>
+        <td rowspan="2" colspan="2"></td>
+        <td colspan="7">Номер пункта</td>
+      </tr>
+      <tr>
+        <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td>
+      </tr>
+      <tr>
+        <td rowspan="7" style="writing-mode:vertical-lr;transform:rotate(180deg);">Номер пункта</td>
+        <td>1</td><td class="bg-[hsl(var(--secondary))]"></td><td></td><td></td><td>30</td><td>3</td><td></td><td>5</td>
+      </tr>
+      <tr>
+        <td>2</td><td></td><td class="bg-[hsl(var(--secondary))]"></td><td></td><td>21</td><td></td><td>13</td><td></td>
+      </tr>
+      <tr>
+        <td>3</td><td></td><td></td><td class="bg-[hsl(var(--secondary))]"></td><td></td><td>39</td><td>53</td><td>2</td>
+      </tr>
+      <tr>
+        <td>4</td><td>30</td><td>21</td><td></td><td class="bg-[hsl(var(--secondary))]"></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td>5</td><td>3</td><td></td><td>39</td><td></td><td class="bg-[hsl(var(--secondary))]"></td><td>8</td><td></td>
+      </tr>
+      <tr>
+        <td>6</td><td></td><td>13</td><td>53</td><td></td><td>8</td><td class="bg-[hsl(var(--secondary))]"></td><td></td>
+      </tr>
+      <tr>
+        <td>7</td><td>5</td><td></td><td>2</td><td></td><td></td><td></td><td class="bg-[hsl(var(--secondary))]"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+  <div>
+    <div className="bg-white dark:bg-black rounded-xl shadow p-3 flex-shrink-0 flex items-start">
+  <svg width="300" height="310" viewBox="0 0 350 320">
+    <!-- рёбра графа -->
+    <g stroke="hsl(var(--foreground))" stroke-width="3" stroke-linecap="round">
+      <line x1="310" y1="140" x2="210" y2="240" stroke="currentColor" stroke-width="3"/>
+    <line x1="210" y1="240" x2="70" y2="240" stroke="currentColor" stroke-width="3"/>
+    <line x1="70" y1="240" x2="30"  y2="140" stroke="currentColor" stroke-width="3"/>
+    <line x1="30"  y1="140" x2="120" y2="40"  stroke="currentColor" stroke-width="3"/>
+    <line x1="120" y1="40"  x2="270" y2="40"  stroke="currentColor" stroke-width="3"/>
+    <line x1="270" y1="40"  x2="310" y2="140" stroke="currentColor" stroke-width="3"/>
+    <line x1="30"  y1="140" x2="170" y2="140" stroke="currentColor" stroke-width="3"/>
+    <line x1="170" y1="140" x2="270" y2="40"  stroke="currentColor" stroke-width="3"/>
+    <line x1="170" y1="140" x2="70" y2="240" stroke="currentColor" stroke-width="3"/>
+    </g>
+    <!-- вершины -->
+    <g fill="hsl(var(--foreground))" stroke="hsl(var(--foreground))">
+      <circle cx="310" cy="140" r="5" fill="currentColor"/>
+    <circle cx="210" cy="240" r="5" fill="currentColor"/>
+    <circle cx="70" cy="240" r="5" fill="currentColor"/>
+    <circle cx="30"  cy="140" r="5" fill="currentColor"/>
+    <circle cx="120" cy="40"  r="5" fill="currentColor"/>
+    <circle cx="270" cy="40"  r="5" fill="currentColor"/>
+    <circle cx="170" cy="140" r="5" fill="currentColor"/>
+    </g>
+    <!-- подписи -->
+    <g fill="hsl(var(--foreground))">
+      <text x="280" y="140">A</text>
+    <text x="210" y="270">B</text>
+    <text x="270" y="20">C</text>
+    <text x="60"  y="270">D</text>
+    <text x="120" y="20">E</text>
+    <text x="10"  y="140">F</text>
+    <text x="190" y="140">G</text>
+    </g>
+  </svg>
+</div>
+
+  </div>
+</div>
+
+<br />
+Так как таблицу и схему рисовали независимо друг от друга, нумерация населённых пунктов в таблице никак не связана с буквенными обозначениями 
+на графе. Определите, какова сумма протяжённостей дорог из пункта D в пункт G и из пункта A в пункт C.
+В ответе запишите целое число. 
+`
+
+const demoText = `
+<p>Миша заполнял таблицу истинности логической функции <i>F</i></p>
+<center>
+  <i>((w → y) → x) ∨ ¬z</i>,
+</center>
+<p>но успел заполнить лишь фрагмент из трёх различных её строк, даже не указав, какому столбцу таблицы соответствует каждая из переменных <i>w, x, y, z</i>.</p>
+
+<table class="truth-frag">
+  <tbody>
+    <tr><td>0</td><td>1</td><td></td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td></td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td></td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td colspan="4"></td><td><i>F</i></td></tr>
+  </tbody>
+</table>
+
+<p>
+  Определите, какому столбцу таблицы соответствует каждая из переменных <i>w, x, y, z</i>.<br>
+  В ответе напишите буквы <i>w, x, y, z</i> в том порядке, в котором идут соответствующие им столбцы (сначала буква, соответствующая первому столбцу; затем — второму столбцу, и&nbsp;т.&nbsp;д.). Буквы в ответе пишите подряд, никаких разделителей между буквами ставить не нужно.
+</p>
+
+`
 
 export default function DemoPage() {
   return (
