@@ -4,12 +4,12 @@ import { createClient } from "@/utils/supabase/server";
 import TaskCard from "@/app/components/TaskCard";
 
 type PageProps = {
-  params: { subject: string; task: string };
+  params: Promise<{ subject: string; task: string }>;
 };
 
 export default async function Page({ params }: PageProps) {
   const supabase = await createClient();
-  const { subject, task } = params;
+  const { subject, task } = await params;
 
   // 1. Найти id предмета
   const { data: subjRow, error: subjErr } = await supabase

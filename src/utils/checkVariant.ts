@@ -1,11 +1,11 @@
 // src/utils/checkVariant.ts
 
-import { checkAnswer, CheckResult } from "./checkAnswer";
+import { checkAnswer, CheckResult, AnswerType } from "./checkAnswer";
 
 // Тип одной задачи (можешь расширить, если у тебя есть дополнительные поля)
 export type VariantTask = {
   id: number | string;
-  answerType: string;
+  answerType: AnswerType;
   correctAnswer: any;
   userAnswer: any;
   maxScore?: number;
@@ -38,7 +38,7 @@ export function checkVariant(
       answerType: task.answerType,
       correctAnswer: task.correctAnswer,
       userAnswer,
-      maxScore: task.maxScore,
+      maxScore: task.maxScore ?? 1,
     });
     results.push(result);
     totalPrimary += result.score;
