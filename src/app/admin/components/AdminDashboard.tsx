@@ -23,12 +23,15 @@ export default function AdminDashboard({ initialTasks, subjects }: AdminDashboar
     };
 
     return (
-        <>
+        <div className="flex flex-col min-h-screen w-full"> {/* Изменено: flex-col и w-full */}
+            {/* Верхняя панель с фильтрами */}
             <AdminSidebar subjects={subjects} onFilterChange={handleFilterChange} />
-            <div className="flex-1 p-8">
+
+            {/* Основная рабочая область */}
+            <div className="flex-1 p-8"> {/* flex-1 чтобы занимал оставшееся пространство */}
                 <h1 className="text-3xl font-bold mb-6">Панель администратора</h1>
                 <AdminTasksTable initialTasks={initialTasks} subjects={subjects} filters={filters} />
             </div>
-        </>
+        </div>
     );
 }

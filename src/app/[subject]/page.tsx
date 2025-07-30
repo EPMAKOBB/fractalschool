@@ -39,27 +39,27 @@ export default async function SubjectPage(props: Props) {
   const uiMeta = subjectsMeta.find(s => s.slug === subject);
 
   /* ---------- Варианты ---------- */
-const { data: rawVariants, error: varErr } = await supabase
-  .from("variants")
-  .select("id,title,slug")
-  .eq("subject_id", subjRow.id)
-  .order("year", { ascending: false });
+  const { data: rawVariants, error: varErr } = await supabase
+    .from("variants")
+    .select("id,title,slug")
+    .eq("subject_id", subjRow.id)
+    .order("year", { ascending: false });
 
-if (varErr) console.error(varErr);
+  if (varErr) console.error(varErr);
 
-const variants = rawVariants ?? []; 
+  const variants = rawVariants ?? [];
 
   /* ---------- Список уникальных типов задач ---------- */
- const { data: typesRaw, error: typesErr } = await supabase
-  .from("tasks_static")
-  .select("type_num")
-  .eq("subject_id", subjRow.id);
+  const { data: typesRaw, error: typesErr } = await supabase
+    .from("tasks_static")
+    .select("type_num")
+    .eq("subject_id", subjRow.id);
 
-if (typesErr) console.error(typesErr);
+  if (typesErr) console.error(typesErr);
 
-const typeNums = Array.from(
-  new Set((typesRaw ?? []).map(t => t.type_num).filter(Boolean)),
-).sort((a, b) => a! - b!);// 1, 2, 3 …
+  const typeNums = Array.from(
+    new Set((typesRaw ?? []).map(t => t.type_num).filter(Boolean)),
+  ).sort((a, b) => a! - b!);// 1, 2, 3 …
 
   /* ---------- Рендер ---------- */
   return (
@@ -79,9 +79,11 @@ const typeNums = Array.from(
               <Button
                 asChild
                 key={v.id}
-                className="px-3 py-1 border rounded bg-gray-800 hover:bg-gray-700"
+                variant="outline"
+                size="sm"
+
               >
-                <Link href={`/${subject}/variant/${v.slug}`}> 
+                <Link href={`/${subject}/variant/${v.slug}`}>
                   {v.title || `Вариант ${i + 1}`}
                 </Link>
               </Button>
