@@ -1,14 +1,13 @@
-// src/app/auth/callback/page.tsx (НОВАЯ ВЕРСИЯ)
+// src/app/auth/callback/page.tsx (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/utils/supabase/client";
 
-export const dynamic = 'force-dynamic'; // Убедитесь, что эта строка на месте
-
-export default function AuthCallbackPage() {
+// 1. Логика вынесена в отдельный компонент
+function AuthCallbackClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -19,22 +18,29 @@ export default function AuthCallbackPage() {
       return;
     }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "SIGNED_IN" && session) {
-          router.replace("/lk");
-        }
-      },
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        router.replace("/lk");
+      }
+    });
 
     return () => {
       subscription?.unsubscribe();
     };
   }, [router, searchParams]);
 
+  return <p>Подтверждение… Пожалуйста, подождите.</p>;
+}
+
+// 2. Основная страница теперь оборачивает клиентский компонент в <Suspense>
+export default function AuthCallbackPage() {
   return (
     <main className="flex items-center justify-center min-h-screen p-6">
-      <p>Подтверждение… Пожалуйста, подождите.</p>
+      <Suspense fallback={<p>Загрузка...</p>}>
+        <AuthCallbackClient />
+      </Suspense>
     </main>
   );
 }
