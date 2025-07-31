@@ -6,6 +6,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/utils/supabase/client";
+
 export const dynamic = 'force-dynamic';
 
 export default function AuthCallbackPage() {
