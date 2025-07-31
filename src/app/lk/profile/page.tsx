@@ -1,13 +1,16 @@
 // src/app/lk/profile/page.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 /* -------------------------------------------------- */
-/*  Types & helpers                                   */
+/* Types & helpers                                    */
 /* -------------------------------------------------- */
 
 type Profile = {
@@ -22,11 +25,12 @@ const isJsonResponse = (res: Response) =>
   res.headers.get("content-type")?.includes("application/json");
 
 /* -------------------------------------------------- */
-/*  Component                                         */
+/* Component                                          */
 /* -------------------------------------------------- */
 
 export default function ProfilePage() {
   /* ---------- state ---------- */
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -113,69 +117,91 @@ export default function ProfilePage() {
     }
   }
 
+  /* ---------- logout handler ---------- */
+  const handleLogout = async () => {
+    // Добавлено подтверждение перед выходом
+    const isConfirmed = window.confirm(
+      "Вы уверены, что хотите выйти из аккаунта?"
+    );
+    if (isConfirmed) {
+      await supabase.auth.signOut();
+      router.push("/");
+      router.refresh();
+    }
+  };
+
   /* ---------- UI ---------- */
   if (loading) return <p className="p-4">Загрузка…</p>;
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-6">
+    <div className="mx-auto max-w-md space-y-6">
       <h1 className="text-2xl font-bold">Профиль</h1>
 
-      {/* Имя */}
-      <div>
-        <Input
-          value={profile.name}
-          placeholder="Ермаков Виктор"
-          onChange={(e) =>
-            setProfile({ ...profile, name: e.target.value })
-          }
-          maxLength={64}
-        />
-        <p className="mt-1 text-xs text-muted-foreground">
-          Ваши Фамилия Имя в любом формате (необязательно)
-        </p>
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Имя */}
+        <div>
+          <Input
+            value={profile.name}
+            placeholder="Иван Иванов"
+            onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+            maxLength={64}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Ваши Фамилия Имя в любом формате (необязательно)
+          </p>
+        </div>
 
-      {/* Никнейм */}
-      <div>
-        <Input
-          value={profile.nickname}
-          placeholder="Super_Victor"
-          onChange={(e) =>
-            setProfile({ ...profile, nickname: e.target.value })
-          }
-          maxLength={32}
-          pattern="^[a-zA-Z0-9_]{3,32}$"
-          title="Никнейм может содержать только латиницу, цифры или _ , 3–32 символа."
-        />
-        <p className="mt-1 text-xs text-muted-foreground">
-          Уникальный nickname (необязательно)
-        </p>
-      </div>
+        {/* Никнейм */}
+        <div>
+          <Input
+            value={profile.nickname}
+            placeholder="Super_Ivan"
+            onChange={(e) =>
+              setProfile({ ...profile, nickname: e.target.value })
+            }
+            maxLength={32}
+            pattern="^[a-zA-Z0-9_]{3,32}$"
+            title="Никнейм может содержать только латиницу, цифры или _ , 3–32 символа."
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Уникальный nickname (необязательно)
+          </p>
+        </div>
 
-      {/* Bio */}
-      <div>
-        <Textarea
-          rows={4}
-          value={profile.bio}
-          placeholder="Пару слов о себе"
-          onChange={(e) =>
-            setProfile({ ...profile, bio: e.target.value })
-          }
-        />
-        <p className="mt-1 text-xs text-muted-foreground">
-          Любая информация о себе (необязательно)
-        </p>
-      </div>
+        {/* Bio */}
+        <div>
+          <Textarea
+            rows={4}
+            value={profile.bio}
+            placeholder="Пару слов о себе"
+            onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Любая информация о себе (необязательно)
+          </p>
+        </div>
 
-      {/* TODO: AvatarUploader */}
+        {/* TODO: AvatarUploader */}
 
-      {/* Сообщения */}
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      {success && <p className="text-sm text-green-600">{success}</p>}
+        {/* Сообщения */}
+        {error && <p className="text-sm text-destructive">{error}</p>}
+        {success && <p className="text-sm text-green-600">{success}</p>}
 
-      <Button type="submit" disabled={loading} className="w-full">
-        {loading ? "Сохраняю…" : "Сохранить"}
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? "Сохраняю…" : "Сохранить"}
+        </Button>
+      </form>
+
+      <hr />
+
+      <Button
+        type="button"
+        variant="link" // Стиль изменен на "link" для вида ссылки
+        onClick={handleLogout}
+        className="w-full"
+      >
+        Выйти из аккаунта
       </Button>
-    </form>
+    </div>
   );
 }
