@@ -7,7 +7,7 @@ import { supabase } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; // Убедитесь, что эта строка на месте
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -16,7 +16,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Этот хук проверяет URL на наличие ошибки и показывает ее
   useEffect(() => {
     const errorMessage = searchParams.get("error");
     if (errorMessage) {
@@ -29,7 +28,6 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
-    // Указываем, куда перенаправить пользователя после клика по ссылке
     const redirectUrl = `${window.location.origin}/auth/callback`;
 
     const { error: authError } = await supabase.auth.signInWithOtp({
@@ -61,7 +59,6 @@ export default function LoginPage() {
             autoComplete="email"
           />
         </div>
-
         <Button
           type="submit"
           disabled={loading}

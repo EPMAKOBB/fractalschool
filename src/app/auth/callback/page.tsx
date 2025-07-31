@@ -1,20 +1,19 @@
 // src/app/auth/callback/page.tsx (НОВАЯ ВЕРСИЯ)
 
-
 "use client";
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/utils/supabase/client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'; // Убедитесь, что эта строка на месте
 
 export default function AuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const error = searchParams.get("error_description"); // Supabase передает ошибку в этом параметре
+    const error = searchParams.get("error_description");
     if (error) {
       router.replace(`/login?error=Ссылка для входа недействительна или истекла.`);
       return;
