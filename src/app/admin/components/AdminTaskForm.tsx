@@ -169,11 +169,21 @@ export default function AdminTaskForm({ initialTask, subjects, onSave, onCancel 
                                         : String(taskData.answer_json ?? '') // Используем ?? для null/undefined
                                 }
                                 onChange={(e) => {
+                                    // Create a temporary variable for the value
+                                    const newValue = e.target.value;
                                     try {
-                                        setTaskData(prevData => ({ ...prevData, answer_json: JSON.parse(e.target.value) }));
+                                        // Attempt to parse the new value
+                                        const parsedValue = JSON.parse(newValue);
+                                        // If successful, update the state with the parsed object
+                                        setTaskData(prevData => ({ ...prevData, answer_json: parsedValue }));
                                     } catch (error) {
-                                        console.error("Неверный формат JSON для ответа:", error);
-                                        setTaskData(prevData => ({ ...prevData, answer_json: e.target.value as any }));
+                                        // If parsing fails, and the value is not an empty string, handle the error
+                                        if (newValue !== '') {
+                                            console.error("Неверный формат JSON для ответа:", error);
+                                        }
+                                        // Always save the raw string value. This prevents the crash.
+                                        // TaskCard can handle this.
+                                        setTaskData(prevData => ({ ...prevData, answer_json: newValue as any }));
                                     }
                                 }}
                                 rows={4}
