@@ -37,13 +37,20 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     const taskData: Task = await request.json();
 
-    // Создание новой задачи
-    const { data, error } = await supabase.from('tasks_static').insert([taskData]).select();
+    // Удаляем id из объекта, так как Supabase сгенерирует его сам
+    const { id, ...newTaskData } = taskData;
+
+    const { data, error } = await supabase.from('tasks_static').insert([newTaskData]).select();
 
     if (error) {
         console.error('Ошибка создания задачи:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    if (!data || data.length === 0) {
+        return NextResponse.json({ error: 'Не удалось создать задачу' }, { status: 500 });
+    }
+
     return NextResponse.json({ success: true, task: data[0] });
 }
 

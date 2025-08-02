@@ -169,20 +169,22 @@ export default function AdminTaskForm({ initialTask, subjects, onSave, onCancel 
                                         : String(taskData.answer_json ?? '') // Используем ?? для null/undefined
                                 }
                                 onChange={(e) => {
-                                    // Create a temporary variable for the value
+                                    // Сохраняем новое значение из поля ввода
                                     const newValue = e.target.value;
                                     try {
-                                        // Attempt to parse the new value
-                                        const parsedValue = JSON.parse(newValue);
-                                        // If successful, update the state with the parsed object
-                                        setTaskData(prevData => ({ ...prevData, answer_json: parsedValue }));
-                                    } catch (error) {
-                                        // If parsing fails, and the value is not an empty string, handle the error
+                                        // Пытаемся распарсить только если поле не пустое
                                         if (newValue !== '') {
-                                            console.error("Неверный формат JSON для ответа:", error);
+                                            const parsedValue = JSON.parse(newValue);
+                                            // Если парсинг успешен, обновляем состояние
+                                            setTaskData(prevData => ({ ...prevData, answer_json: parsedValue }));
+                                        } else {
+                                            // Если поле пустое, устанавливаем значение в null
+                                            setTaskData(prevData => ({ ...prevData, answer_json: null }));
                                         }
-                                        // Always save the raw string value. This prevents the crash.
-                                        // TaskCard can handle this.
+                                    } catch (error) {
+                                        // Если парсинг не удался, мы не обновляем состояние с JSON,
+                                        // но можем сохранить raw-строку или null, чтобы не было сбоя
+                                        console.error("Неверный формат JSON для ответа:", error);
                                         setTaskData(prevData => ({ ...prevData, answer_json: newValue as any }));
                                     }
                                 }}
