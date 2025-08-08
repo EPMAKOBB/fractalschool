@@ -1,31 +1,39 @@
 // src/app/components/AuthNav.tsx
-"use client";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { supabase } from "@/utils/supabase/client";
-import useUserProfile from "@/app/lk/components/useUserProfile";
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import useUserProfile from '@/app/lk/components/useUserProfile';
 
 export function AuthNav() {
+  const supabase = createClient();
+
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
 
-  // Подписка на изменения сессии
+  // Следим за сессией
   useEffect(() => {
     let mounted = true;
+
+    // первичный статус
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (mounted) setIsAuth(!!session);
     });
+
+    // подписка на изменения
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_, session) => {
+      (_event, session) => {
         if (mounted) setIsAuth(!!session);
       }
     );
+
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
-  // Получаем профиль только если авторизованы
+  // профиль (хук сам должен уметь работать без авторизации)
   const { profile, isLoading } = useUserProfile();
 
   if (isAuth === null) return <span className="text-gray-500">…</span>;
@@ -38,15 +46,14 @@ export function AuthNav() {
     );
   }
 
-  // Показываем имя, если оно заполнено
   const label =
-    (profile?.name && profile.name.trim().length > 0)
+    profile?.name && profile.name.trim().length > 0
       ? profile.name
-      : "Личный кабинет";
+      : 'Личный кабинет';
 
   return (
     <Link href="/lk" className="hover:underline">
-      {isLoading ? "…" : label}
+      {isLoading ? '…' : label}
     </Link>
   );
 }

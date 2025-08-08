@@ -1,17 +1,14 @@
 // src/app/lk/profile/page.tsx
+'use client';
 
-"use client";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/utils/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-
-/* -------------------------------------------------- */
-/* Types & helpers                                    */
-/* -------------------------------------------------- */
+/* -------------------- Types & helpers -------------------- */
 
 type Profile = {
   name: string;
@@ -20,117 +17,109 @@ type Profile = {
   avatar_url: string;
 };
 
-/** Проверяет, есть ли в ответе JSON-контент */
-const isJsonResponse = (res: Response) =>
-  res.headers.get("content-type")?.includes("application/json");
+type ApiProfileResponse =
+  | { profile: Partial<Profile> }
+  | { error: string };
 
-/* -------------------------------------------------- */
-/* Component                                          */
-/* -------------------------------------------------- */
+const isJsonResponse = (res: Response) =>
+  res.headers.get('content-type')?.includes('application/json');
+
+/* ------------------------- Page -------------------------- */
 
 export default function ProfilePage() {
-  /* ---------- state ---------- */
   const router = useRouter();
+  const supabase = createClient(); // <-- вместо import { supabase }
+
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [profile, setProfile] = useState<Profile>({
-    name: "",
-    nickname: "",
-    bio: "",
-    avatar_url: "",
+    name: '',
+    nickname: '',
+    bio: '',
+    avatar_url: '',
   });
 
-  /* ---------- load profile ---------- */
+  // загрузка профиля
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
+    (async () => {
       try {
-        const res = await fetch("/api/lk/profile");
-
-        const data = isJsonResponse(res)
+        const res = await fetch('/api/lk/profile');
+        const data: ApiProfileResponse = isJsonResponse(res)
           ? await res.json()
-          : { error: await res.text() };
+          : ({ error: await res.text() } as any);
 
         if (cancelled) return;
 
-        if (!res.ok || data.error) {
-          setError(data.error || "Не удалось загрузить профиль");
-        } else if (data.profile) {
-          setProfile({
-            name: data.profile.name ?? "",
-            nickname: data.profile.nickname ?? "",
-            bio: data.profile.bio ?? "",
-            avatar_url: data.profile.avatar_url ?? "",
-          });
+        if (!res.ok || 'error' in data) {
+          setError(('error' in data && data.error) || 'Не удалось загрузить профиль');
+        } else if ('profile' in data) {
+          setProfile(p => ({
+            ...p,
+            name: data.profile.name ?? '',
+            nickname: data.profile.nickname ?? '',
+            bio: data.profile.bio ?? '',
+            avatar_url: data.profile.avatar_url ?? '',
+          }));
         }
       } catch {
-        if (!cancelled) setError("Сетевая ошибка при загрузке профиля");
+        if (!cancelled) setError('Сетевая ошибка при загрузке профиля');
       } finally {
         if (!cancelled) setLoading(false);
       }
-    }
+    })();
 
-    load();
     return () => {
       cancelled = true;
     };
   }, []);
 
-  /* ---------- save profile ---------- */
+  // сохранение профиля
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    // нативная HTML-валидация
     if (!e.currentTarget.reportValidity()) return;
 
-    setLoading(true);
+    setSaving(true);
     setError(null);
     setSuccess(null);
 
     const trimmedNickname = profile.nickname.trim().toLowerCase();
 
     try {
-      const res = await fetch("/api/lk/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...profile,
-          nickname: trimmedNickname,
-        }),
+      const res = await fetch('/api/lk/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...profile, nickname: trimmedNickname }),
       });
 
-      const data = isJsonResponse(res)
+      const data: ApiProfileResponse = isJsonResponse(res)
         ? await res.json()
-        : { error: await res.text() };
+        : ({ error: await res.text() } as any);
 
-      if (!res.ok || data.error) {
-        setError(data.error || "Ошибка сервера");
+      if (!res.ok || 'error' in data) {
+        setError(('error' in data && data.error) || 'Ошибка сервера');
       } else {
-        setSuccess("Профиль сохранён!");
+        setSuccess('Профиль сохранён!');
+        router.refresh();
       }
     } catch {
-      setError("Сетевая ошибка при сохранении");
+      setError('Сетевая ошибка при сохранении');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   }
 
-  /* ---------- logout handler ---------- */
+  // выход из аккаунта
   const handleLogout = async () => {
-    // Добавлено подтверждение перед выходом
-    const isConfirmed = window.confirm(
-      "Вы уверены, что хотите выйти из аккаунта?"
-    );
-    if (isConfirmed) {
-      await supabase.auth.signOut();
-      router.push("/");
-      router.refresh();
-    }
+    if (!window.confirm('Вы уверены, что хотите выйти из аккаунта?')) return;
+    await supabase.auth.signOut();
+    router.push('/');
+    router.refresh();
   };
 
-  /* ---------- UI ---------- */
   if (loading) return <p className="p-4">Загрузка…</p>;
 
   return (
@@ -156,12 +145,10 @@ export default function ProfilePage() {
           <Input
             value={profile.nickname}
             placeholder="Super_Ivan"
-            onChange={(e) =>
-              setProfile({ ...profile, nickname: e.target.value })
-            }
+            onChange={(e) => setProfile({ ...profile, nickname: e.target.value })}
             maxLength={32}
             pattern="^[a-zA-Z0-9_]{3,32}$"
-            title="Никнейм может содержать только латиницу, цифры или _ , 3–32 символа."
+            title="Никнейм: латиница/цифры/_, 3–32 символа."
           />
           <p className="mt-1 text-xs text-muted-foreground">
             Уникальный nickname (необязательно)
@@ -187,19 +174,14 @@ export default function ProfilePage() {
         {error && <p className="text-sm text-destructive">{error}</p>}
         {success && <p className="text-sm text-green-600">{success}</p>}
 
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? "Сохраняю…" : "Сохранить"}
+        <Button type="submit" disabled={saving} className="w-full">
+          {saving ? 'Сохраняю…' : 'Сохранить'}
         </Button>
       </form>
 
       <hr />
 
-      <Button
-        type="button"
-        variant="link" // Стиль изменен на "link" для вида ссылки
-        onClick={handleLogout}
-        className="w-full"
-      >
+      <Button type="button" variant="link" onClick={handleLogout} className="w-full">
         Выйти из аккаунта
       </Button>
     </div>
